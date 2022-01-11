@@ -1,22 +1,24 @@
 import { GameRoom } from "../interfaces/gameState";
 
 let gameState: GameRoom;
-
+const worldWidth = 2000;
 
 
 const move = () => {
 
     gameState.players.forEach((player) => {
-        if (gameState.pressedKeys.left) {
+        //apply gravity
+        player.y = player.y + player.ySpeed
+        player.ySpeed += player.gravity
+
+        //Listen to player movement input
+        if (gameState.pressedKeys.left && player.topLeft.x > -worldWidth/2) {
             player.xSpeed = -player.movementSpeed
-        } else if (gameState.pressedKeys.right) {
+        } else if (gameState.pressedKeys.right && player.topLeft.x < worldWidth/2) {
             player.xSpeed = +player.movementSpeed
         } else {
             player.xSpeed = 0
         }
-
-
-
         player.x += player.xSpeed;
     })
 }
@@ -24,29 +26,18 @@ const move = () => {
 const collide = () => {
     gameState.platforms.forEach((platform) => {
         gameState.players.forEach((player) => {
-            if (platform.intersects(player)) {
+            if (platform.intersects(player) && player.ySpeed > 0) {
                 player.ySpeed = -player.maxSpeed
             }
         })
     })
 }
 
-const applyGravity = () => {
-    const updatedPlayers = gameState.players.map(player => {
-        player.y = player.y + player.ySpeed
-        player.ySpeed += player.gravity
-        return player
-    });
-
-    gameState.players = updatedPlayers
-}
 
 
 export const updateGameState = (state: GameRoom): GameRoom => {
 
     gameState = state
-
-    applyGravity();
     collide();
     move();
 

@@ -21,22 +21,29 @@ const Game = () => {
   
     let gameState: GameRoom;
 
+    let canvasWidth = 1280
+    let canvasHeight = 720;
+
+
+    const initialTranslation = canvasWidth/2;
+    let translatedX = initialTranslation + 50;
+    let translatedY = canvasHeight;
+
+
 
   const setup = (p5: p5Types, canvasParentRef: Element) => {
-    p5.createCanvas(1280, 720).parent(canvasParentRef)
+    p5.createCanvas(canvasWidth, canvasHeight).parent(canvasParentRef)
     p5.rectMode(p5.CENTER)
 
-    const player = new Player(p5, 640, 125)
+    const player = new Player(p5, 0, -canvasHeight/2)
     const level = generateLevel(p5)
     gameState = {players: [player], platforms: level, pressedKeys: {left: false, right: false}}
-
-    console.log(level);
-    
   }
 
-  
-
   const draw = (p5: p5Types) => {
+
+    p5.translate(translatedX, translatedY)
+
     p5.background(0)
     gameState?.platforms.forEach(platform => {
         platform.show()
@@ -44,6 +51,30 @@ const Game = () => {
 
     gameState?.players.forEach(player => {
         player.show()
+
+        // translatedX++;
+
+        let leftBorder = -translatedX
+        let rightBorder = canvasWidth - translatedX
+        let topBorder = -translatedY
+        let bottomBorder = canvasHeight - translatedY
+
+
+
+
+        if(player.topLeft.x < leftBorder + 100){
+            translatedX = -player.topLeft.x + 100
+        }
+        if(player.bottomRight.x > rightBorder - 100){
+            translatedX = -player.bottomRight.x + canvasWidth -100
+        }
+        if(player.topLeft.y < topBorder + 100){
+            translatedY = -player.topLeft.y + 100
+        }
+        if(player.bottomRight.y > bottomBorder){
+            translatedY = -player.bottomRight.y + canvasHeight
+        }
+        
     })
 
     gameState = updateGameState(gameState);
@@ -53,11 +84,8 @@ const Game = () => {
   const keyPressed = (p5: p5Types) => {
     switch(p5.keyCode){
         case p5.RIGHT_ARROW:
-            console.log("right pressed");
             
             gameState.pressedKeys.right = true
-
-            console.log(gameState.pressedKeys);
             
             break;
         case p5.LEFT_ARROW:
@@ -68,7 +96,6 @@ const Game = () => {
 
   const keyReleased = (p5: p5Types) => {
       gameState.pressedKeys = {left: false, right: false}
-      console.log(gameState.pressedKeys);
       
   }
 
@@ -76,7 +103,7 @@ const Game = () => {
   return (
     <Sketch
       className="block mx-auto"
-      style={{ width: 1280 }}
+      style={{ width: canvasWidth }}
       setup={setup}
       draw={draw}
       keyPressed={keyPressed}

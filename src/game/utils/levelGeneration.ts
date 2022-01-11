@@ -1,12 +1,12 @@
 import { Platform } from "../models/platform"
 import p5Types from 'p5'
-const amountOfPlaforms = 20
+const amountOfPlaforms = 1000
 
 export const generateLevel = (p5: p5Types): Platform[] => {
     const platforms: Platform[] = []
     for (let i = 0; i < amountOfPlaforms; i++) {
 
-        const platform = new Platform(p5, getRandomInt(0, 1280), getRandomInt(0, 720))
+        const platform = new Platform(p5, getRandomInt(-1000, 1000), getRandomInt(0, -10000))
         platforms.push(platform)
     }
 
