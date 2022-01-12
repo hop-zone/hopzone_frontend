@@ -1,11 +1,14 @@
-import React from 'react'
+import React, { HTMLAttributes, useEffect, useRef } from 'react'
 import PageLayout from 'src/components/layout'
+import PageTitle from 'src/components/text/PageTitle'
 import Game from 'src/game'
 
 const GameSession = () => {
+
   return (
     <PageLayout>
-        <Game />
+     <PageTitle>Game</PageTitle>
+      <Game />
     </PageLayout>
   )
 }

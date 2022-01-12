@@ -6,7 +6,7 @@ const PageLayout: FunctionComponent = ({ children }) => {
   return (
     <>
       <AppHeader />
-      {children}
+      <div className='max-w-7xl py-12 px-4 mx-auto'>{children}</div>
       <AppFooter />
     </>
   )

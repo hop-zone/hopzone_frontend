@@ -18,97 +18,111 @@ const Sketch = dynamic(() => import('react-p5'), {
 })
 
 const Game = () => {
-  
-    let gameState: GameRoom;
+  const parentRef = useRef<HTMLDivElement>(null)
 
-    let canvasWidth = 1280
-    let canvasHeight = 720;
+  const [gameState, setGameState] = useState<GameRoom>({
+    players: [],
+    platforms: [],
+    pressedKeys: { left: false, right: false },
+  })
 
+  const [canvasWidth, setCanvasWidth] = useState(1280-32)
 
-    const initialTranslation = canvasWidth/2;
-    let translatedX = initialTranslation + 50;
-    let translatedY = canvasHeight;
-
-
+  // let canvasWidth = 1280 - 32
+  let canvasHeight = 720
+  const initialTranslation = canvasWidth / 2
+  let translatedX = initialTranslation + 50
+  let translatedY = canvasHeight
 
   const setup = (p5: p5Types, canvasParentRef: Element) => {
-    p5.createCanvas(canvasWidth, canvasHeight).parent(canvasParentRef)
-    p5.rectMode(p5.CENTER)
+    setCanvasWidth(canvasParentRef.clientWidth - 16)
+    p5.createCanvas(canvasParentRef.clientWidth - 16, canvasHeight).parent(canvasParentRef)
 
-    const player = new Player(p5, 0, -canvasHeight/2)
+    p5.rectMode(p5.CENTER)
+    const player = new Player(p5, 0, -canvasHeight / 2)
     const level = generateLevel(p5)
-    gameState = {players: [player], platforms: level, pressedKeys: {left: false, right: false}}
+    setGameState({
+      players: [player],
+      platforms: level,
+      pressedKeys: { left: false, right: false },
+    })
   }
 
   const draw = (p5: p5Types) => {
-
     p5.translate(translatedX, translatedY)
 
     p5.background(0)
     gameState?.platforms.forEach(platform => {
-        platform.show()
-    });
-
-    gameState?.players.forEach(player => {
-        player.show()
-
-        // translatedX++;
-
-        let leftBorder = -translatedX
-        let rightBorder = canvasWidth - translatedX
-        let topBorder = -translatedY
-        let bottomBorder = canvasHeight - translatedY
-
-
-
-
-        if(player.topLeft.x < leftBorder + 100){
-            translatedX = -player.topLeft.x + 100
-        }
-        if(player.bottomRight.x > rightBorder - 100){
-            translatedX = -player.bottomRight.x + canvasWidth -100
-        }
-        if(player.topLeft.y < topBorder + 100){
-            translatedY = -player.topLeft.y + 100
-        }
-        if(player.bottomRight.y > bottomBorder){
-            translatedY = -player.bottomRight.y + canvasHeight
-        }
-        
+      platform.show()
     })
 
-    gameState = updateGameState(gameState);
-    
+    gameState?.players.forEach(player => {
+      player.show()
+
+      // translatedX++;
+
+      let leftBorder = -translatedX
+      let rightBorder = canvasWidth - translatedX
+      let topBorder = -translatedY
+      let bottomBorder = canvasHeight - translatedY
+
+      if (player.topLeft.x < leftBorder + 100) {
+        translatedX = -player.topLeft.x + 100
+      }
+      if (player.bottomRight.x > rightBorder - 100) {
+        translatedX = -player.bottomRight.x + canvasWidth - 100
+      }
+      if (player.topLeft.y < topBorder + 100) {
+        translatedY = -player.topLeft.y + 100
+      }
+      if (player.bottomRight.y > bottomBorder) {
+        translatedY = -player.bottomRight.y + canvasHeight
+      }
+    })
+
+    setGameState(updateGameState(gameState))
   }
 
   const keyPressed = (p5: p5Types) => {
-    switch(p5.keyCode){
-        case p5.RIGHT_ARROW:
-            
-            gameState.pressedKeys.right = true
-            
-            break;
-        case p5.LEFT_ARROW:
-            gameState.pressedKeys.left = true
-            break;
+    switch (p5.keyCode) {
+      case p5.RIGHT_ARROW:
+        gameState.pressedKeys.right = true
+
+        break
+      case p5.LEFT_ARROW:
+        gameState.pressedKeys.left = true
+        break
     }
   }
 
   const keyReleased = (p5: p5Types) => {
-      gameState.pressedKeys = {left: false, right: false}
-      
+    gameState.pressedKeys = { left: false, right: false }
   }
 
+  const windowResized = (p5: p5Types) => {
+    if (parentRef != null && parentRef.current) {
+      if (parentRef.current.clientWidth < 1280 - 32) {
+        setCanvasWidth(parentRef.current.clientWidth)
+        p5.resizeCanvas(parentRef.current.clientWidth, canvasHeight)
+      } else {
+        p5.resizeCanvas(1280 - 32, canvasHeight)
+      }
+    }
+  }
 
   return (
-    <Sketch
-      className="block mx-auto"
-      style={{ width: canvasWidth }}
-      setup={setup}
-      draw={draw}
-      keyPressed={keyPressed}
-      keyReleased={keyReleased}
-    />
+    <div className=" w-full" ref={parentRef}>
+      {parentRef != null ? (
+        <Sketch
+          className="block mx-auto"
+          setup={setup}
+          draw={draw}
+          keyPressed={keyPressed}
+          keyReleased={keyReleased}
+          windowResized={windowResized}
+        />
+      ) : null}
+    </div>
   )
 }
 
