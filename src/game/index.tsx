@@ -42,13 +42,14 @@ const Game = () => {
     const player = new Player(p5, 0, -canvasHeight / 2)
     const level = generateLevel(p5)
     setGameState({
+      ...gameState,
       players: [player],
       platforms: level,
-      pressedKeys: { left: false, right: false },
     })
   }
 
   const draw = (p5: p5Types) => {
+    
     p5.translate(translatedX, translatedY)
 
     p5.background(0)
@@ -58,8 +59,6 @@ const Game = () => {
 
     gameState?.players.forEach(player => {
       player.show()
-
-      // translatedX++;
 
       let leftBorder = -translatedX
       let rightBorder = canvasWidth - translatedX
@@ -80,7 +79,7 @@ const Game = () => {
       }
     })
 
-    setGameState(updateGameState(gameState))
+    setGameState(updateGameState(gameState, p5))
   }
 
   const keyPressed = (p5: p5Types) => {

@@ -6,6 +6,7 @@ interface Point {
 }
 
 export class GameObject {
+    id: number
     p5: p5Types
     x: number
     y: number
@@ -32,6 +33,7 @@ export class GameObject {
         this.p5 = p5;
         this.x = xPos
         this.y = yPos
+        this.id = Math.floor(Math.random() * 100)
     }
 
     updatePosition(x: number, y: number){
