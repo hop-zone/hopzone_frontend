@@ -17,7 +17,7 @@ const TextInput: FunctionComponent<TextInputProps> = ({id, title, isPassword = f
     <div className=' mb-5'>
       <label className='block mb-2 text-purple-300 text-sm' htmlFor={id}>{title}</label>
       <input
-        className="p-4 border-purple-500 border-2 w-full rounded-xl bg-purple-300 text-purple-700 focus:outline-none placeholder-purple-500"
+        className="p-4 border-purple-500 border-2 w-full rounded-lg bg-purple-300 text-purple-700 focus:outline-none placeholder-purple-500"
         placeholder="eg. john@doe.com"
         type={isPassword? 'password' : 'text'}
         id={id}
