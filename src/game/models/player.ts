@@ -1,6 +1,6 @@
 
 import { GameObject } from './gameObject';
-
+import p5Types from 'p5'
 
 export class Player extends GameObject {
 
@@ -11,7 +11,8 @@ export class Player extends GameObject {
     maxSpeed: number = 15
     movementSpeed: number = 10
 
-    show() {
-        this.p5.rect(this.x, this.y, this.width, this.height)
+    show(p5: p5Types) {
+        p5.fill(this.color)
+        p5.rect(this.x, this.y, this.width, this.height)
     }
 }

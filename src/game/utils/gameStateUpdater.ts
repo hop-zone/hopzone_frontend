@@ -11,7 +11,7 @@ const worldWidth = 2000;
 
 
 
-const move = (player: Player) => {
+const move = (player: Player, index: number) => {
 
     //apply gravity
     player.y = player.y + player.ySpeed
@@ -29,9 +29,9 @@ const move = (player: Player) => {
 
 }
 
-const collide = (platform: Platform) => {
-    gameState.players.forEach((player) => {
-        if (platform.intersects(player) && player.ySpeed > 0) {
+const collide = (player: Player) => {
+    gameState.platforms.forEach((platform) => {
+        if (player.intersects(platform) && player.ySpeed > 0) {
             player.ySpeed = -player.maxSpeed
         }
     })
@@ -53,8 +53,6 @@ const updateOuterPlatforms = (platform: Platform) => {
     } else {
         gameState.highestPlatform = platform
     }
-
-
 }
 
 const updateOuterPlayers = (player: Player) => {
@@ -80,13 +78,11 @@ const updateOuterPlayers = (player: Player) => {
 const generatePlatforms = () => {
     if (gameState.highestPlayer!.y < gameState.highestPlatform!.y + 100) {
         for (let i = 0; i < 4; i++) {
-            const newPlatform: Platform = new Platform(p5, getRandomInt(-1000, 1000), getRandomInt(gameState.highestPlatform!.y, gameState.highestPlatform!.y - 100))
+            const newPlatform: Platform = new Platform(getRandomInt(-1000, 1000), getRandomInt(gameState.highestPlatform!.y, gameState.highestPlatform!.y - 100))
             gameState.platforms.push(newPlatform)
         }
 
     }
-
-    // console.log(`Lowest player ${gameState.lowestPlayer!.y}, lowest Platform: ${gameState.lowestPlatform!.y}`);
 
     if (gameState.lowestPlayer!.y < gameState.lowestPlatform!.y + -500) {
         gameState.platforms = gameState.platforms.filter((p: Platform) => {
@@ -111,17 +107,15 @@ export const updateGameState = (state: GameRoom, ctx: p5Types): GameRoom => {
     resetPositions();
 
 
-    gameState.players.forEach((player) => {
-        move(player)
+    gameState.players.forEach((player, index) => {
+        move(player, index)
+        collide(player)
         updateOuterPlayers(player)
     })
 
     gameState.platforms.forEach((platform) => {
-        collide(platform)
         updateOuterPlatforms(platform)
     })
-
-
     generatePlatforms()
 
     return gameState

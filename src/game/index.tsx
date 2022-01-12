@@ -26,7 +26,7 @@ const Game = () => {
     pressedKeys: { left: false, right: false },
   })
 
-  const [canvasWidth, setCanvasWidth] = useState(1280-32)
+  const [canvasWidth, setCanvasWidth] = useState(1280 - 32)
 
   // let canvasWidth = 1280 - 32
   let canvasHeight = 720
@@ -36,30 +36,29 @@ const Game = () => {
 
   const setup = (p5: p5Types, canvasParentRef: Element) => {
     setCanvasWidth(canvasParentRef.clientWidth - 16)
-    p5.createCanvas(canvasParentRef.clientWidth - 16, canvasHeight).parent(canvasParentRef)
+    p5.createCanvas(canvasParentRef.clientWidth - 16, canvasHeight).parent(
+      canvasParentRef,
+    )
 
     p5.rectMode(p5.CENTER)
-    const player = new Player(p5, 0, -canvasHeight / 2)
-    const _player = new Player(p5, 0, -canvasHeight / 2)
+    const player = new Player(0, -canvasHeight / 2)
     const level = generateLevel(p5)
     setGameState({
       ...gameState,
-      players: [player, _player],
+      players: [player],
       platforms: level,
     })
   }
 
   const draw = (p5: p5Types) => {
-    
     p5.translate(translatedX, translatedY)
-
     p5.background(0)
     gameState?.platforms.forEach(platform => {
-      platform.show()
+      platform.show(p5)
     })
 
     gameState?.players.forEach(player => {
-      player.show()
+      player.show(p5)
 
       let leftBorder = -translatedX
       let rightBorder = canvasWidth - translatedX

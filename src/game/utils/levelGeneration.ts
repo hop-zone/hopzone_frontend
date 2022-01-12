@@ -6,7 +6,7 @@ export const generateLevel = (p5: p5Types): Platform[] => {
     const platforms: Platform[] = []
     for (let i = 0; i < amountOfPlaforms; i++) {
 
-        const platform = new Platform(p5, getRandomInt(-1000, 1000), getRandomInt(0, -500))
+        const platform = new Platform(getRandomInt(-1000, 1000), getRandomInt(0, -500))
         platforms.push(platform)
     }
 

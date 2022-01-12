@@ -7,13 +7,14 @@ interface Point {
 
 export class GameObject {
     id: number
-    p5: p5Types
     x: number
     y: number
     width: number = 1
     height: number = 1
 
     gravity: number = 0.4
+
+    color: number
 
     get topLeft(): Point {
         const x = this.x - this.width/2
@@ -29,11 +30,12 @@ export class GameObject {
         return {x: x, y: y}
     }
 
-    constructor(p5: p5Types, xPos: number, yPos: number) {
-        this.p5 = p5;
+    constructor(xPos: number, yPos: number) {
         this.x = xPos
         this.y = yPos
         this.id = Math.floor(Math.random() * 10000)
+
+        this.color = Math.random() * 255
     }
 
     updatePosition(x: number, y: number){
