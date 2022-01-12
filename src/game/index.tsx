@@ -7,10 +7,6 @@ import React, {
 } from 'react'
 import p5Types from 'p5'
 import dynamic from 'next/dynamic'
-import { Platform } from './models/platform'
-import { Player } from './models/player'
-import { GameRoom } from './interfaces/gameState'
-import { generateLevel } from './utils/levelGeneration'
 import { useGameState } from './providers/gameStateProvider'
 
 const Sketch = dynamic(() => import('react-p5'), {
@@ -56,8 +52,6 @@ const Game = () => {
     let topBorder = -translatedY
     let bottomBorder = canvasHeight - translatedY
 
-    
-    
     if (player.topLeft.x < leftBorder + 100) {
       
       setTranslatedX(-player.topLeft.x + 100) 
@@ -71,8 +65,6 @@ const Game = () => {
     if (player.bottomRight.y > bottomBorder) {
       setTranslatedY(-player.bottomRight.y + canvasHeight)
     }
-
-    // setGameState(updateGameState(gameState))
     updateGameState();
   }
 
@@ -102,6 +94,7 @@ const Game = () => {
       }
     }
   }
+
 
 
   return (
