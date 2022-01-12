@@ -31,6 +31,9 @@ module.exports = {
           900: '#221a56',
         },
       },
+      spacing: {
+        100: '40rem'
+      }
     },
   },
 
