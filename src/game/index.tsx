@@ -40,10 +40,11 @@ const Game = () => {
 
     p5.rectMode(p5.CENTER)
     const player = new Player(p5, 0, -canvasHeight / 2)
+    const _player = new Player(p5, 0, -canvasHeight / 2)
     const level = generateLevel(p5)
     setGameState({
       ...gameState,
-      players: [player],
+      players: [player, _player],
       platforms: level,
     })
   }

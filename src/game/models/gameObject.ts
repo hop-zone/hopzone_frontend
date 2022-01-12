@@ -33,7 +33,7 @@ export class GameObject {
         this.p5 = p5;
         this.x = xPos
         this.y = yPos
-        this.id = Math.floor(Math.random() * 100)
+        this.id = Math.floor(Math.random() * 10000)
     }
 
     updatePosition(x: number, y: number){
