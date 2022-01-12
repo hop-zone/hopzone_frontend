@@ -11,7 +11,7 @@ import { Platform } from './models/platform'
 import { Player } from './models/player'
 import { GameRoom } from './interfaces/gameState'
 import { generateLevel } from './utils/levelGeneration'
-import { updateGameState } from './utils/gameStateUpdater'
+import { useGameState } from './providers/gameStateProvider'
 
 const Sketch = dynamic(() => import('react-p5'), {
   ssr: false,
@@ -20,82 +20,76 @@ const Sketch = dynamic(() => import('react-p5'), {
 const Game = () => {
   const parentRef = useRef<HTMLDivElement>(null)
 
-  const [gameState, setGameState] = useState<GameRoom>({
-    players: [],
-    platforms: [],
-    pressedKeys: { left: false, right: false },
-  })
+  const {state, updateGameState, moveLeft, moveRight, stopMoving} = useGameState();
 
+  
   const [canvasWidth, setCanvasWidth] = useState(1280 - 32)
+  const [canvasHeight, setCanvasHeight] = useState(720)
+  const [translatedX, setTranslatedX] = useState((canvasWidth/2) + 50)
+  const [translatedY, setTranslatedY] = useState(canvasHeight)
 
-  // let canvasWidth = 1280 - 32
-  let canvasHeight = 720
-  const initialTranslation = canvasWidth / 2
-  let translatedX = initialTranslation + 50
-  let translatedY = canvasHeight
+
 
   const setup = (p5: p5Types, canvasParentRef: Element) => {
     setCanvasWidth(canvasParentRef.clientWidth - 16)
     p5.createCanvas(canvasParentRef.clientWidth - 16, canvasHeight).parent(
       canvasParentRef,
     )
-
     p5.rectMode(p5.CENTER)
-    const player = new Player(0, -canvasHeight / 2)
-    const level = generateLevel(p5)
-    setGameState({
-      ...gameState,
-      players: [player],
-      platforms: level,
-    })
   }
 
   const draw = (p5: p5Types) => {
     p5.translate(translatedX, translatedY)
     p5.background(0)
-    gameState?.platforms.forEach(platform => {
+    state?.platforms.forEach(platform => {
       platform.show(p5)
     })
 
-    gameState?.players.forEach(player => {
-      player.show(p5)
-
-      let leftBorder = -translatedX
-      let rightBorder = canvasWidth - translatedX
-      let topBorder = -translatedY
-      let bottomBorder = canvasHeight - translatedY
-
-      if (player.topLeft.x < leftBorder + 100) {
-        translatedX = -player.topLeft.x + 100
-      }
-      if (player.bottomRight.x > rightBorder - 100) {
-        translatedX = -player.bottomRight.x + canvasWidth - 100
-      }
-      if (player.topLeft.y < topBorder + 100) {
-        translatedY = -player.topLeft.y + 100
-      }
-      if (player.bottomRight.y > bottomBorder) {
-        translatedY = -player.bottomRight.y + canvasHeight
-      }
+    state?.players.forEach(p => {
+      p.show(p5)
     })
 
-    setGameState(updateGameState(gameState, p5))
+    const player = state.players[0]
+
+    let leftBorder = -translatedX
+    let rightBorder = canvasWidth - translatedX
+    let topBorder = -translatedY
+    let bottomBorder = canvasHeight - translatedY
+
+    
+    
+    if (player.topLeft.x < leftBorder + 100) {
+      
+      setTranslatedX(-player.topLeft.x + 100) 
+    }
+    if (player.bottomRight.x > rightBorder - 100) {
+      setTranslatedX(-player.bottomRight.x + canvasWidth - 100)
+    }
+    if (player.topLeft.y < topBorder + 100) {
+      setTranslatedY(-player.topLeft.y + 100) 
+    }
+    if (player.bottomRight.y > bottomBorder) {
+      setTranslatedY(-player.bottomRight.y + canvasHeight)
+    }
+
+    // setGameState(updateGameState(gameState))
+    updateGameState();
   }
 
   const keyPressed = (p5: p5Types) => {
     switch (p5.keyCode) {
       case p5.RIGHT_ARROW:
-        gameState.pressedKeys.right = true
-
+        
+        moveRight(0)
         break
       case p5.LEFT_ARROW:
-        gameState.pressedKeys.left = true
+        moveLeft(0)
         break
     }
   }
 
   const keyReleased = (p5: p5Types) => {
-    gameState.pressedKeys = { left: false, right: false }
+    stopMoving(0)
   }
 
   const windowResized = (p5: p5Types) => {
@@ -108,6 +102,7 @@ const Game = () => {
       }
     }
   }
+
 
   return (
     <div className=" w-full" ref={parentRef}>

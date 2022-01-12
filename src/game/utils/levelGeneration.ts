@@ -2,7 +2,7 @@ import { Platform } from "../models/platform"
 import p5Types from 'p5'
 const amountOfPlaforms = 100
 
-export const generateLevel = (p5: p5Types): Platform[] => {
+export const generateLevel = (): Platform[] => {
     const platforms: Platform[] = []
     for (let i = 0; i < amountOfPlaforms; i++) {
 

@@ -99,11 +99,9 @@ const resetPositions = () => {
 }
 
 
-export const updateGameState = (state: GameRoom, ctx: p5Types): GameRoom => {
+export const updateGameState = (state: GameRoom): GameRoom => {
 
     gameState = state
-    p5 = ctx
-
     resetPositions();
 
 
