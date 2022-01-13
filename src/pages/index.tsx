@@ -17,6 +17,10 @@ const Home: NextPage = () => {
     router.push('/gamesession')
   }
 
+  const handleCreateGameClick = () => {
+    router.push('/lobby')
+  }
+
   return (
     <PageLayout>
       <Authenticated>
@@ -41,7 +45,7 @@ const Home: NextPage = () => {
             <div className="flex flex-col justify-between min-h-full max-h-96 max-w-md mx-auto">
               <SubTitle className="text-center">Quick Join</SubTitle>
               <QuickJoinMenu />
-              <Button>CREATE NEW</Button>
+              <Button onClick={handleCreateGameClick}>CREATE NEW</Button>
             </div>
           </div>
         </Card>

@@ -27,8 +27,8 @@ const Game = () => {
 
 
   const setup = (p5: p5Types, canvasParentRef: Element) => {
-    setCanvasWidth(canvasParentRef.clientWidth - 16)
-    p5.createCanvas(canvasParentRef.clientWidth - 16, canvasHeight).parent(
+    setCanvasWidth(canvasParentRef.clientWidth)
+    p5.createCanvas(canvasParentRef.clientWidth, canvasHeight).parent(
       canvasParentRef,
     )
     p5.rectMode(p5.CENTER)

@@ -3,14 +3,20 @@ const defaultTheme = require('tailwindcss/defaultTheme')
 module.exports = {
   // mode: 'jit',
 
-  purge: ['./src/pages/**/*.{js,ts,jsx,tsx}', './src/components/**/*.{js,ts,jsx,tsx}'],
+  purge: [
+    './src/pages/**/*.{js,ts,jsx,tsx}',
+    './src/components/**/*.{js,ts,jsx,tsx}',
+  ],
 
   darkMode: 'media', // or 'class'
 
   theme: {
     extend: {
+      height: {
+        fitscreen: 'calc(100vh - 64px - 56px)',
+      },
       fontFamily: {
-        kanit: ['Kanit', ...defaultTheme.fontFamily.sans]
+        kanit: ['Kanit', ...defaultTheme.fontFamily.sans],
       },
       colors: {
         theme: {
@@ -43,8 +49,8 @@ module.exports = {
         },
       },
       spacing: {
-        100: '40rem'
-      }
+        100: '40rem',
+      },
     },
   },
 
