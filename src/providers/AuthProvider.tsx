@@ -23,7 +23,7 @@ export enum FirebaseError {
   wrongPassword = 'auth/wrong-password',
   userNotFound = 'auth/user-not-found',
   tooManyRequests = 'auth/too-many-requests',
-  weakPassword ='auth/weak-password'
+  weakPassword = 'auth/weak-password',
 }
 
 interface IAuthContext {
@@ -116,8 +116,8 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
       try {
         createUserWithEmailAndPassword(auth, email, password)
           .then(async userCredential => {
-            setUser(userCredential.user)
-            console.log(userCredential)
+            changeUserDisplayName(username, userCredential.user)
+            setUser({ ...userCredential.user, displayName: username })
             resolve({ success: true })
           })
           .catch(error => {
@@ -125,28 +125,6 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
 
             reject({ success: false, errCode: errorCode })
           })
-        // const url: string = process.env.NEXT_PUBLIC_BACKEND as string
-        // fetch(`http://${url.split('/')[2]}/auth/signup`, {
-        //   method: 'POST',
-        //   headers: { 'content-type': 'application/json' },
-        //   body: JSON.stringify({
-        //     email: email,
-        //     password: password,
-        //     name: username,
-        //   }),
-        // })
-        //   .then(async response => {
-        //     await login(email, password)
-        //       .then(res => {
-        //         resolve(true)
-        //       })
-        //       .catch(e => {
-        //         reject
-        //       })
-        //   })
-        //   .catch(e => {
-        //     reject
-        //   })
       } catch (e) {
         reject
       }
@@ -162,8 +140,6 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
         displayName: username,
       })
         .then(value => {
-          console.log(value)
-
           resolve(true)
         })
         .catch(e => {
@@ -174,6 +150,7 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
   }
 
   const login = (email: string, password: string): Promise<LoginResponse> => {
+
     return new Promise((resolve, reject) => {
       signInWithEmailAndPassword(auth, email, password)
         .then(async userCredential => {
@@ -183,10 +160,7 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
         })
         .catch(error => {
           const errorCode = error.code
-          const errorMessage = error.message
-          console.log(error)
-
-          resolve({ success: false, errCode: errorCode })
+          reject({ success: false, errCode: errorCode })
         })
     })
   }
