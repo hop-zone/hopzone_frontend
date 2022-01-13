@@ -6,11 +6,13 @@ import AppHeader from './AppHeader'
 
 const PageLayout: FunctionComponent = ({ children }) => {
   return (
-    <>
+    <div className="h-screen">
       <AppHeader />
-      <div className="max-w-7xl py-12 px-4 mx-auto">{children}</div>
+      <div className="max-w-7xl py-12 px-4 mx-auto h-fitscreen overflow-scroll">
+        {children}
+      </div>
       <AppFooter />
-    </>
+    </div>
   )
 }
 
