@@ -5,14 +5,6 @@ import AppFooter from './AppFooter'
 import AppHeader from './AppHeader'
 
 const PageLayout: FunctionComponent = ({ children }) => {
-  const { user, loaded } = useAuth()
-  const router = useRouter()
-
-  useEffect(() => {
-    if (loaded && !user) {
-      router.push('/login')
-    }
-  }, [user, loaded])
   return (
     <>
       <AppHeader />

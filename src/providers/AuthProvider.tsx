@@ -16,8 +16,10 @@ import {
   User,
   updateProfile,
   createUserWithEmailAndPassword,
+  signInAnonymously,
 } from 'firebase/auth'
 import { createLogicalWrapper } from 'src/utils/logicalWrapper'
+import { useRouter } from 'next/router'
 
 export enum FirebaseError {
   wrongPassword = 'auth/wrong-password',
@@ -35,6 +37,7 @@ interface IAuthContext {
     username: string,
   ) => Promise<LoginResponse>
   login: (email: string, password: string) => Promise<LoginResponse>
+  signInAsGuest: () => Promise<LoginResponse>
   logout: () => Promise<Boolean>
   signedIn: boolean
   loaded: boolean
@@ -74,6 +77,8 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
   const [loaded, setLoaded] = useState(false)
   const [signedIn, setSignedIn] = useState(false)
+
+  const router = useRouter()
   const app: FirebaseApp = initializeApp(firebaseConfig)
   const auth: Auth = getAuth()
   setPersistence(auth, browserLocalPersistence)
@@ -81,10 +86,12 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
   useEffect(() => {
     let mounted = true
 
+    // console.log(auth.currentUser);
+
     restoreAuth().then(data => {
       if (mounted) {
         setUser(data.state)
-        
+
         setSignedIn(true)
       }
     })
@@ -94,15 +101,35 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
     }
   }, [])
 
+  const signInAsGuest = (): Promise<LoginResponse> => {
+    return new Promise((resolve, reject) => {
+      try {
+        signInAnonymously(auth)
+          .then(async userCredential => {
+            setUser(userCredential.user)
+            setSignedIn(true)
+            resolve({ success: true })
+          })
+          .catch(e => {
+            reject({ succes: false })
+          })
+      } catch (error) {
+        reject
+      }
+    })
+  }
+
   const restoreAuth = (): Promise<{ state: User; token: string }> => {
     return new Promise((resolve, reject) => {
       try {
         auth.onAuthStateChanged(async state => {
-          // console.log(state)
           if (state) {
             const token = await state.getIdToken()
             resolve({ state, token })
           } else {
+            if (router.pathname != '/login' && router.pathname != '/register') {
+              router.push('/login')
+            }
             reject
           }
         })
@@ -191,6 +218,7 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
     loaded,
     logout,
     signedIn,
+    signInAsGuest,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

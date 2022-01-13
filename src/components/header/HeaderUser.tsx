@@ -24,7 +24,7 @@ const DropDownItem: FunctionComponent<DropDownItemProps> = ({
         onClick={onClick}
       >
         <div className=" flex items-center gap-2">
-          {<Icon size={24} className=' text-purple-900'/>}
+          {<Icon size={24} className=" text-purple-900" />}
           <a className="whitespace-nowrap text-purple-700">{title}</a>
         </div>
       </li>
@@ -73,7 +73,7 @@ const HeaderUser = () => {
   }, [])
   return (
     <div ref={divRef} className="hidden md:flex items-center gap-4 relative">
-      <p className="">{user?.displayName}</p>
+      <p className="">{user?.isAnonymous ? 'Guest' : user?.displayName}</p>
       <div
         onClick={handleOpenProfile}
         className=" rounded-3xl hover:bg-orange-800 hover:cursor-pointer  p-1"

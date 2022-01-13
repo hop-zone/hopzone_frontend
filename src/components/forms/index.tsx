@@ -90,7 +90,6 @@ const Form: FunctionComponent<FormProps> = ({
             hasError = true
             newItem.isFaulty = true
             newItem.error = 'Passwords must match'
-
             return newItem
           }
         }

@@ -19,7 +19,7 @@ interface Credentials {
 }
 
 const Login = () => {
-  const { login } = useAuth()
+  const { login, signInAsGuest } = useAuth()
   const router = useRouter()
 
   const [loading, setLoading] = useState(false)
@@ -31,7 +31,7 @@ const Login = () => {
       label: 'E-Mail',
       type: InputTypes.EMAIL,
       required: true,
-      placeholder: 'eg. john@doe.com'
+      placeholder: 'eg. john@doe.com',
     },
     {
       id: 'password',
@@ -43,7 +43,11 @@ const Login = () => {
   ])
 
   const handleGuestBtn = () => {
-    console.log('continuing as guest...')
+    setLoading(true)
+    signInAsGuest().then(r => {
+      setLoading(false)
+      router.push('/')
+    })
   }
 
   const handleSubmit = (formItems: FormItem[]) => {
@@ -99,9 +103,14 @@ const Login = () => {
           onSubmit={handleSubmit}
         />
         {loading ? (
-          <p className=" text-center mb-4">Please wait...</p>
+          <p className=" text-center mb-16">Please wait...</p>
         ) : (
-          <Button onClick={handleLoginBtn}>LOG IN</Button>
+          <>
+            <Button onClick={handleLoginBtn}>LOG IN</Button>
+            <DiscreteButton onClick={handleGuestBtn} className="mx-auto">
+              CONTINUE AS GUEST
+            </DiscreteButton>
+          </>
         )}
         <p className=" text-sm text-purple-400 text-center">
           I don't have an account, let me{' '}
