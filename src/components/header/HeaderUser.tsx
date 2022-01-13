@@ -72,7 +72,7 @@ const HeaderUser = () => {
     }
   }, [])
   return (
-    <div ref={divRef} className="hidden md:flex items-center gap-4 relative">
+    <div ref={divRef} className="flex items-center gap-4 relative">
       <p className="">{user?.isAnonymous ? 'Guest' : user?.displayName}</p>
       <div
         onClick={handleOpenProfile}
