@@ -31,7 +31,6 @@ const TextInput: FunctionComponent<TextInputProps> = ({
       </div>
       <input
         className={`p-4  border-2 w-full rounded-lg bg-purple-300 text-purple-700 focus:outline-none placeholder-purple-500 ${hasError ? 'border-theme-orange': 'border-purple-500'}`}
-        placeholder="eg. john@doe.com"
         type={isPassword ? 'password' : 'text'}
         id={id}
         {...props}

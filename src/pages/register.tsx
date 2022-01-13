@@ -1,24 +1,18 @@
 import Link from 'next/link'
-import React, { FormEvent, useState } from 'react'
-import FormComponent, { FormItem, InputTypes } from 'src/components/forms'
+import React, { useState } from 'react'
+import Form, { FormItem, InputTypes } from 'src/components/forms'
 import Button from 'src/components/forms/Button'
-import DiscreteButton from 'src/components/forms/DiscreteButton'
-import TextInput from 'src/components/forms/TextInput'
-import PageLayout from 'src/components/layout'
 import LandingPageLayout from 'src/components/layout/LandingPageLayout'
 
-interface Credentials {
-  email: string
-  password: string
-}
 
-const Login = () => {
+const Register = () => {
   const [submitting, setSubmitting] = useState(false)
   const [items, setItems] = useState<FormItem[]>([
     {
       id: 'email',
       value: '',
       label: 'E-Mail',
+      placeholder:'eg john@doe.com',
       type: InputTypes.EMAIL,
       required: true,
     },
@@ -29,47 +23,45 @@ const Login = () => {
       type: InputTypes.PASSWORD,
       required: true,
     },
+    {
+      id: 'repeatpasswword',
+      value: '',
+      label: 'Repeat Password',
+      type: InputTypes.PASSWORD,
+      required: true,
+    },
   ])
 
-
-  const handleGuestBtn = () => {
-    console.log('continuing as guest...')
+  const handleSubmit = (formItems: FormItem[]) => {
+      
   }
 
-  const handleSubmit = (items: FormItem[]) => {
-
-    console.log('submitted!');
-    
+  const handleRegisterBtn = () => {
+      setSubmitting(true)
   }
 
-  const handleLoginBtn = () => {
-    setSubmitting(true)
-  }
-
-  return (
-    <LandingPageLayout>
+  return <LandingPageLayout>
       <div className=" md:w-100 h-full m-auto p-8">
         <h1 className="text-theme-orange text-5xl font-semibold text-center mb-2">
-          LOGIN
+          REGISTER
         </h1>
         <h2 className="text-center text-2xl mb-5">Welcome to Hopzone!</h2>
-        <FormComponent
+        <Form
           setSubmitting={setSubmitting}
           submitting={submitting}
           items={items}
           setItems={setItems}
           onSubmit={handleSubmit}
         />
-        <Button onClick={handleLoginBtn}>LOG IN</Button>
+        <Button onClick={handleRegisterBtn}>REGISTER</Button>
         <p className=" text-sm text-purple-400 text-center">
-          I don't have an account, let me{' '}
-          <Link href={'/register'}>
-            <a className=" font-semibold">Register</a>
+          I already have an account, let me{' '}
+          <Link href={'/login'}>
+            <a className=" font-semibold">Login</a>
           </Link>
         </p>
       </div>
-    </LandingPageLayout>
-  )
+  </LandingPageLayout>
 }
 
-export default Login
+export default Register

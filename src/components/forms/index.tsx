@@ -18,6 +18,7 @@ export interface FormItem {
   id: string
   value: string
   label: string
+  placeholder?: string
   type: InputTypes
   required?: boolean
   isFaulty?: boolean
@@ -133,6 +134,7 @@ const Form: FunctionComponent<FormProps> = ({
             value={item.value}
             hasError={item.isFaulty}
             errorMsg={item.error}
+            placeholder={item.placeholder}
           />
         )
       })}
