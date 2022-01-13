@@ -27,7 +27,7 @@ const Register = () => {
       id: 'repeatpasswword',
       value: '',
       label: 'Repeat Password',
-      type: InputTypes.PASSWORD,
+      type: InputTypes.REPEATPASSWORD,
       required: true,
     },
   ])

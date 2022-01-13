@@ -9,6 +9,7 @@ import React, {
 import TextInput from './TextInput'
 
 export enum InputTypes {
+  REPEATPASSWORD = 'repeatpassword',
   PASSWORD = 'password',
   TEXT = 'text',
   EMAIL = 'email',
@@ -40,14 +41,17 @@ const Form: FunctionComponent<FormProps> = ({
   setSubmitting,
   onSubmit,
 }) => {
-
   const isValidEmail = (item: FormItem) => {
     const re = /\S+@\S+\.\S+/
     return re.test(item.value)
   }
 
+  const isSamePassword = (password: string, repeatpassword: string) => {
+    return password == repeatpassword
+  }
+
   const isEmpty = (item: FormItem) => {
-    if (item.required) {    
+    if (item.required) {
       if (!(item.value.toString().trim().length > 0)) {
         return true
       }
@@ -56,9 +60,10 @@ const Form: FunctionComponent<FormProps> = ({
   }
 
   const formHasErrors = (formItems: FormItem[]) => {
+    let hasError = false
+    let passwordIndex = 0
 
-    let hasError = false;
-    const newItems: FormItem[] = formItems.map(item => {
+    const newItems: FormItem[] = formItems.map((item, index) => {
       const newItem = { ...item }
 
       if (isEmpty(newItem)) {
@@ -72,6 +77,20 @@ const Form: FunctionComponent<FormProps> = ({
             hasError = true
             newItem.isFaulty = true
             newItem.error = 'Invalid Email'
+            return newItem
+          }
+        }
+
+        if (item.type == InputTypes.PASSWORD) {
+          passwordIndex = index
+        }
+
+        if (item.type == InputTypes.REPEATPASSWORD) {
+          if (!isSamePassword(formItems[passwordIndex].value, newItem.value)) {
+            hasError = true
+            newItem.isFaulty = true
+            newItem.error = 'Passwords must match'
+
             return newItem
           }
         }
@@ -129,7 +148,7 @@ const Form: FunctionComponent<FormProps> = ({
             key={item.id}
             id={item.id}
             title={item.label}
-            isPassword={item.type == InputTypes.PASSWORD ? true : false}
+            isPassword={item.type == InputTypes.PASSWORD || item.type == InputTypes.REPEATPASSWORD ? true : false}
             onChange={handleFormItemChange}
             value={item.value}
             hasError={item.isFaulty}
