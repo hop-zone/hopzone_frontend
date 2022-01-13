@@ -37,6 +37,7 @@ interface IAuthContext {
   login: (email: string, password: string) => Promise<LoginResponse>
   logout: () => Promise<Boolean>
   signedIn: boolean
+  loaded: boolean
 }
 
 export interface LoginResponse {
@@ -71,6 +72,7 @@ export const NotAuthenticated = createLogicalWrapper(
 
 export const AuthProvider: FunctionComponent = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
+  const [loaded, setLoaded] = useState(false)
   const [signedIn, setSignedIn] = useState(false)
   const app: FirebaseApp = initializeApp(firebaseConfig)
   const auth: Auth = getAuth()
@@ -78,12 +80,15 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
 
   useEffect(() => {
     let mounted = true
+
     restoreAuth().then(data => {
       if (mounted) {
         setUser(data.state)
+        
         setSignedIn(true)
       }
     })
+    setLoaded(true)
     return () => {
       mounted = false
     }
@@ -150,7 +155,6 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
   }
 
   const login = (email: string, password: string): Promise<LoginResponse> => {
-
     return new Promise((resolve, reject) => {
       signInWithEmailAndPassword(auth, email, password)
         .then(async userCredential => {
@@ -184,6 +188,7 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
     restoreAuth,
     register,
     login,
+    loaded,
     logout,
     signedIn,
   }
