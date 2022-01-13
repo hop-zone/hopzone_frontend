@@ -35,7 +35,7 @@ const DropDownItem: FunctionComponent<DropDownItemProps> = ({
 const UserDropDown = () => {
   const { logout } = useAuth()
   return (
-    <div className=" w-48 z-50 absolute top-16 right-0 bg-white border-2 rounded-lg border-orange-600 shadow">
+    <div className=" w-48 z-50 absolute top-10 right-0 bg-white border-2 rounded-lg border-orange-600 shadow">
       <ul>
         <DropDownItem
           Icon={MdLogout}

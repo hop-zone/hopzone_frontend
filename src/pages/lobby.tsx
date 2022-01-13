@@ -11,9 +11,10 @@ const Lobby = () => {
 
   const players: Player[] = [
     { displayName: 'Alexander' },
-    { displayName: 'Activitiez' },
-    { displayName: 'Activitiez' },
-    { displayName: 'Activitiez' },
+    { displayName: 'Alexander' },
+    { displayName: 'Alexander' },
+    { displayName: 'Alexander' },
+
   ]
 
   const handleStartGameClick = () => {
@@ -22,7 +23,7 @@ const Lobby = () => {
 
   return (
     <PageLayout>
-      <div className="flex flex-col justify-between h-full">
+      <div className="flex flex-col justify-between h-full gap-8">
         <div className="grid gap-8">
           <PageTitle>Lobby</PageTitle>
           <LobbyPlayers players={players} />

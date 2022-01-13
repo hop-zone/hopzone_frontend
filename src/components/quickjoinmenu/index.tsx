@@ -18,7 +18,7 @@ const MenuItem: FunctionComponent<MenuItemProps> = ({ item }) => {
       <p className='text-theme-orange'>{item.playerCount}/4</p>
       <span>
         {item.hostname}
-        <Link href={'#'}>
+        <Link href={'/lobby'}>
           <a className='text-theme-orange hover:text-orange-800'>
             <MdArrowForward size={24} className="inline-block ml-2 " />
           </a>
@@ -43,7 +43,7 @@ const QuickJoinMenu = () => {
   return (
     <ul className=' overflow-scroll mb-8'>
       {menuItems.map(item => {
-        return <MenuItem item={item} />
+        return <MenuItem key={item.gameId} item={item} />
       })}
     </ul>
   )

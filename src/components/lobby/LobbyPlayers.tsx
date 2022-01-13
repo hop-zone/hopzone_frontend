@@ -16,7 +16,7 @@ const LobbyPlayers: FunctionComponent<LobbyPlayerProps> = ({ players }) => {
       <div className="grid md:grid-cols-2 gap-6">
         {players.map(p => {
           return (
-            <Card className=" p-5 flex justify-between items-center text-2xl">
+            <Card key={p.displayName} className=" p-5 flex justify-between items-center text-2xl">
               <p>{p.displayName}</p>
               <MdPerson size={24}/>
             </Card>
