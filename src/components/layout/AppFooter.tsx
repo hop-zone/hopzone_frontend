@@ -61,7 +61,7 @@ const Facebook = () => {
 
 const AppFooter = () => {
   return (
-    <footer className="fixed bottom-0 bg-purple-800 w-full">
+    <footer className="bg-purple-800 w-full">
       <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
         <p>&copy; Alexander Everaert</p>
         <div className='flex gap-8 items-center'>

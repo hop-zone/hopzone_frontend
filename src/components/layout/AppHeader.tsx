@@ -7,9 +7,12 @@ import HeaderUser from '../header/HeaderUser'
 
 const AppHeader = () => {
   return (
-    <nav className="bg-gradient-to-r from-theme-lightpurple to-theme-orange">
+    <nav className="bg-gradient-to-r from-theme-lightpurple to-theme-orange ">
       <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between">
-        <h1>Hopzone</h1>
+        <Link href={'/'}>
+          <a>Hopzone</a>
+        </Link>
+
         <Authenticated>
           <HeaderUser />
         </Authenticated>
