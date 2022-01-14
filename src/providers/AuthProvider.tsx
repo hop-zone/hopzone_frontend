@@ -105,7 +105,7 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
   }, [])
 
   const createWebSocket = (token: string) => {
-    const newSocket = io('http://localhost:3001', {
+    const newSocket = io('http://192.168.0.165:3001', {
       auth: {
         token: `Bearer ${token}`,
       },
