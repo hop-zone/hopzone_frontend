@@ -10,16 +10,23 @@ import PageTitle from 'src/components/text/PageTitle'
 import SubTitle from 'src/components/text/SubTitle'
 import { Authenticated, useAuth } from 'src/providers/AuthProvider'
 
+import io, { Socket } from 'socket.io-client'
+
+const ENDPOINT = 'http://localhost:3001'
+
 const Home: NextPage = () => {
   const router = useRouter()
 
+  const { socket } = useAuth()
+
+  const handleCreatLobbyClick = () => {
+    socket?.emit("f2b_newLobby")
+    // router.push('/lobby')
+  }
   const handleSingleplayerClick = () => {
     router.push('/gamesession')
   }
 
-  const handleCreateGameClick = () => {
-    router.push('/lobby')
-  }
 
   return (
     <PageLayout>
@@ -45,7 +52,7 @@ const Home: NextPage = () => {
             <div className="flex flex-col justify-between min-h-full max-h-96 max-w-md mx-auto">
               <SubTitle className="text-center">Quick Join</SubTitle>
               <QuickJoinMenu />
-              <Button onClick={handleCreateGameClick}>CREATE NEW</Button>
+              <Button onClick={handleCreatLobbyClick}>CREATE NEW</Button>
             </div>
           </div>
         </Card>

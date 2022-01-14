@@ -20,6 +20,7 @@ import {
 } from 'firebase/auth'
 import { createLogicalWrapper } from 'src/utils/logicalWrapper'
 import { useRouter } from 'next/router'
+import { io, Socket } from 'socket.io-client'
 
 export enum FirebaseError {
   wrongPassword = 'auth/wrong-password',
@@ -30,6 +31,7 @@ export enum FirebaseError {
 
 interface IAuthContext {
   user: User | null
+  socket: Socket | undefined
   restoreAuth: () => Promise<{ state: User; token: string }>
   register: (
     email: string,
@@ -75,6 +77,7 @@ export const NotAuthenticated = createLogicalWrapper(
 
 export const AuthProvider: FunctionComponent = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
+  const [socket, setSocket] = useState<Socket>()
   const [loaded, setLoaded] = useState(false)
   const [signedIn, setSignedIn] = useState(false)
 
@@ -90,8 +93,8 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
 
     restoreAuth().then(data => {
       if (mounted) {
+        createWebSocket(data.token)
         setUser(data.state)
-
         setSignedIn(true)
       }
     })
@@ -101,11 +104,28 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
     }
   }, [])
 
+  const createWebSocket = (token: string) => {
+    const newSocket = io('http://localhost:3001', {
+      auth: {
+        token: `Bearer ${token}`,
+      },
+    })
+
+    newSocket.on('connect_error', data => {
+      console.log(data)
+    })
+
+    setSocket(newSocket)
+
+    console.log('creating new socket connection')
+  }
+
   const signInAsGuest = (): Promise<LoginResponse> => {
     return new Promise((resolve, reject) => {
       try {
         signInAnonymously(auth)
           .then(async userCredential => {
+            createWebSocket(await userCredential.user.getIdToken())
             setUser(userCredential.user)
             setSignedIn(true)
             resolve({ success: true })
@@ -185,6 +205,7 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
     return new Promise((resolve, reject) => {
       signInWithEmailAndPassword(auth, email, password)
         .then(async userCredential => {
+          createWebSocket(await userCredential.user.getIdToken())
           setUser(userCredential.user)
           setSignedIn(true)
           resolve({ success: true })
@@ -200,6 +221,7 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
     return new Promise((resolve, reject) => {
       signOut(auth)
         .then(() => {
+          socket?.disconnect()
           setUser(null)
           setSignedIn(false)
           resolve(true)
@@ -219,6 +241,7 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
     logout,
     signedIn,
     signInAsGuest,
+    socket,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
