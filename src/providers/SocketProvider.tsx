@@ -10,13 +10,15 @@ import { useAuth } from './AuthProvider'
 
 export enum SocketMessages {
   activeRooms = 'b2f_gamerooms',
-  currentLobby = 'b2f_lobby',
-  getCurrentLobby = 'f2b_lobby',
+  lobbyInfo = 'b2f_lobby',
+  joinLobby = 'f2b_joinLobby',
+  leaveLobby = 'f2b_leaveLobby',
 }
 
 interface ISocketContext {
   activeLobbies: GameRoom[] | undefined
-  getLobby: (lobbyId: number) => Promise<boolean>
+  joinLobby: (lobbyId: number) => Promise<boolean>
+  leaveLobby: (lobbyId: number) => Promise<boolean>
 }
 
 const SocketContext = createContext<ISocketContext>({} as ISocketContext)
@@ -36,21 +38,36 @@ export const SocketProvider: FunctionComponent = ({ children }) => {
         setActiveLobbies(data)
       })
     }
+
+    console.log(socket);
+    
   }, [socket])
 
-  const getLobby = async (lobbyId: number): Promise<boolean> => {
+  const joinLobby = async (lobbyId: number): Promise<boolean> => {
     return new Promise((resolve, reject) => {
-        if(socket){
-            socket.emit(SocketMessages.getCurrentLobby, lobbyId)
-        } else {
-            reject
-        }
+      if (socket) {
+        socket.emit(SocketMessages.joinLobby, lobbyId)
+      } else {
+        reject
+      }
+    })
+  }
+
+  const leaveLobby = (lobbyId: number): Promise<boolean> => {
+    return new Promise((resolve, reject) => {
+      if (socket) {
+        socket.emit(SocketMessages.leaveLobby, lobbyId)
+        resolve
+      } else {
+        reject
+      }
     })
   }
 
   const value = {
     activeLobbies: activeLobbies,
-    getLobby,
+    joinLobby,
+    leaveLobby
   }
 
   return (

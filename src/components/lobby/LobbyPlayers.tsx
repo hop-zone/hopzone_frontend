@@ -11,7 +11,7 @@ const LobbyPlayers: FunctionComponent<LobbyPlayerProps> = ({ players }) => {
   return (
     <div>
       <h2 className=" text-3xl text-theme-orange font-semibold mb-8">
-        Players waiting
+        Players waiting ({players.length}/4)
       </h2>
       <div className="grid md:grid-cols-2 gap-6">
         {players.map(p => {

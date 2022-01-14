@@ -11,6 +11,8 @@ import SubTitle from 'src/components/text/SubTitle'
 import { Authenticated, useAuth } from 'src/providers/AuthProvider'
 
 import io, { Socket } from 'socket.io-client'
+import { SocketMessages } from 'src/providers/SocketProvider'
+import { GameRoom } from 'src/models/serverModels/GameRoom'
 
 const ENDPOINT = 'http://localhost:3001'
 
@@ -20,13 +22,19 @@ const Home: NextPage = () => {
   const { socket } = useAuth()
 
   const handleCreatLobbyClick = () => {
-    socket?.emit("f2b_newLobby")
-    // router.push('/lobby')
+    socket?.emit('f2b_newLobby')
   }
   const handleSingleplayerClick = () => {
     router.push('/gamesession')
   }
 
+  useEffect(() => {
+    if (socket) {
+      socket.on(SocketMessages.lobbyInfo, (data: GameRoom) => {
+        router.push(`/lobby?id=${data.roomId}`)
+      })
+    }
+  }, [socket])
 
   return (
     <PageLayout>
