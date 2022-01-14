@@ -28,11 +28,20 @@ const Home: NextPage = () => {
     router.push('/gamesession')
   }
 
+  const handleJoinLobby = (data: GameRoom) => {
+    console.log('pushing')
+
+    router.push(`/lobby?id=${data.roomId}`)
+  }
+
   useEffect(() => {
     if (socket) {
-      socket.on(SocketMessages.lobbyInfo, (data: GameRoom) => {
-        router.push(`/lobby?id=${data.roomId}`)
-      })
+      socket.on(SocketMessages.lobbyInfo, handleJoinLobby)
+    }
+
+    return () => {
+      // socket?.disconnect()
+      socket?.off(SocketMessages.lobbyInfo, handleJoinLobby)
     }
   }, [socket])
 

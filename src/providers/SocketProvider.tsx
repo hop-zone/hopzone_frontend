@@ -39,8 +39,7 @@ export const SocketProvider: FunctionComponent = ({ children }) => {
       })
     }
 
-    console.log(socket);
-    
+    console.log(socket)
   }, [socket])
 
   const joinLobby = async (lobbyId: number): Promise<boolean> => {
@@ -57,9 +56,9 @@ export const SocketProvider: FunctionComponent = ({ children }) => {
     return new Promise((resolve, reject) => {
       if (socket) {
         socket.emit(SocketMessages.leaveLobby, lobbyId)
-        resolve
+        resolve(true)
       } else {
-        reject
+        reject(false)
       }
     })
   }
@@ -67,7 +66,7 @@ export const SocketProvider: FunctionComponent = ({ children }) => {
   const value = {
     activeLobbies: activeLobbies,
     joinLobby,
-    leaveLobby
+    leaveLobby,
   }
 
   return (

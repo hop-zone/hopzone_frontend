@@ -4,6 +4,7 @@ import Button from 'src/components/forms/Button'
 import PageLayout from 'src/components/layout'
 import LobbyPlayers from 'src/components/lobby/LobbyPlayers'
 import PageTitle from 'src/components/text/PageTitle'
+import useLeaveLobbyPrompt from 'src/hooks/useLeaveLobbyPrompt'
 import { useWarnLeaveLobby } from 'src/hooks/useWarnLeaveLobby'
 import { Player } from 'src/models/player'
 import { GameRoom } from 'src/models/serverModels/GameRoom'
@@ -14,7 +15,8 @@ const Lobby = () => {
   const router = useRouter()
 
   const [loaded, setLoaded] = useState(false)
-  // useWarnLeaveLobby(router.query.id, loaded)
+  useWarnLeaveLobby(router.query.id)
+
   const { socket } = useAuth()
   const { joinLobby, leaveLobby } = useSockets()
 
@@ -35,9 +37,7 @@ const Lobby = () => {
           return { displayName: p.name ? p.name : 'Guest' }
         })
         if (mounted) {
-          setLoaded(true)
           setPlayers(players)
-          setLoaded(true)
         }
       })
     }
@@ -46,6 +46,13 @@ const Lobby = () => {
       mounted = false
     }
   }, [socket])
+
+  useEffect(() => {
+    if (router) {
+
+      setLoaded(true)
+    }
+  }, [router])
 
   return (
     <PageLayout>
