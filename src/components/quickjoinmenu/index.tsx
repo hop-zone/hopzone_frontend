@@ -19,7 +19,7 @@ const MenuItem: FunctionComponent<MenuItemProps> = ({ item }) => {
     <li className="flex justify-between border-b-2 border-purple-600 py-2">
       <p className="text-theme-orange">{item.playerCount}/4</p>
       <span>
-        {item.hostname? item.hostname : "Guest"}
+        {item.hostname ? item.hostname : 'Guest'}
         <Link href={`/lobby?id=${item.gameId}`}>
           <a className="text-theme-orange hover:text-orange-800">
             <MdArrowForward size={24} className="inline-block ml-2 " />
@@ -44,8 +44,11 @@ const QuickJoinMenu = () => {
     if (activeLobbies) {
       setMenuItems(
         activeLobbies.map(l => {
+          const hostname = l.players.find(u => {
+            return u.uid == l.hostId
+          })?.displayName
           return {
-            hostname: l.hostName,
+            hostname: hostname ? hostname : 'Guest',
             playerCount: l.players.length,
             gameId: l.roomId,
           }

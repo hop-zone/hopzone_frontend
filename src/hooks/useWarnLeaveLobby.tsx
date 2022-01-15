@@ -22,7 +22,7 @@ export const useWarnLeaveLobby = (
 
         throw 'Abort route change. Please ignore this error.'
       } else {
-        leaveLobby(parseInt(lobbyId as string))
+        leaveLobby(lobbyId as string)
       }
     }
 

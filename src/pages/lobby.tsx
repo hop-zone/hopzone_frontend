@@ -8,6 +8,7 @@ import useLeaveLobbyPrompt from 'src/hooks/useLeaveLobbyPrompt'
 import { useWarnLeaveLobby } from 'src/hooks/useWarnLeaveLobby'
 import { Player } from 'src/models/player'
 import { GameRoom } from 'src/models/serverModels/GameRoom'
+import { User } from 'src/models/serverModels/User'
 import { useAuth } from 'src/providers/AuthProvider'
 import { SocketMessages, useSockets } from 'src/providers/SocketProvider'
 
@@ -20,7 +21,7 @@ const Lobby = () => {
   const { socket } = useAuth()
   const { joinLobby, leaveLobby } = useSockets()
 
-  const [players, setPlayers] = useState<Player[]>([])
+  const [players, setPlayers] = useState<User[]>([])
 
   const handleStartGameClick = () => {
     router.push('/gamesession')
@@ -30,11 +31,10 @@ const Lobby = () => {
     let mounted = true
     setLoaded(false)
     if (router.query.id && socket) {
-      const id = parseInt(router.query.id as string)
-      joinLobby(id)
+      joinLobby(router.query.id as string)
       socket.on(SocketMessages.lobbyInfo, (data: GameRoom) => {
         const players = data.players.map(p => {
-          return { displayName: p.name ? p.name : 'Guest' }
+          return { displayName: p.displayName ? p.displayName : 'Guest', id: p.uid }
         })
         if (mounted) {
           setPlayers(players)

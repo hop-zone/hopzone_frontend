@@ -17,8 +17,8 @@ export enum SocketMessages {
 
 interface ISocketContext {
   activeLobbies: GameRoom[] | undefined
-  joinLobby: (lobbyId: number) => Promise<boolean>
-  leaveLobby: (lobbyId: number) => Promise<boolean>
+  joinLobby: (lobbyId: string) => Promise<boolean>
+  leaveLobby: (lobbyId: string) => Promise<boolean>
 }
 
 const SocketContext = createContext<ISocketContext>({} as ISocketContext)
@@ -35,6 +35,12 @@ export const SocketProvider: FunctionComponent = ({ children }) => {
   useEffect(() => {
     if (socket) {
       socket.on(SocketMessages.activeRooms, (data: GameRoom[]) => {
+
+        console.log(`received ${SocketMessages.activeRooms}`);
+        console.log(data);
+        
+        
+        
         setActiveLobbies(data)
       })
     }
@@ -42,7 +48,7 @@ export const SocketProvider: FunctionComponent = ({ children }) => {
     console.log(socket)
   }, [socket])
 
-  const joinLobby = async (lobbyId: number): Promise<boolean> => {
+  const joinLobby = async (lobbyId: string): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       if (socket) {
         socket.emit(SocketMessages.joinLobby, lobbyId)
@@ -52,7 +58,7 @@ export const SocketProvider: FunctionComponent = ({ children }) => {
     })
   }
 
-  const leaveLobby = (lobbyId: number): Promise<boolean> => {
+  const leaveLobby = (lobbyId: string): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       if (socket) {
         socket.emit(SocketMessages.leaveLobby, lobbyId)

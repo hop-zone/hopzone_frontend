@@ -1,10 +1,11 @@
 import React, { FunctionComponent } from 'react'
 import { MdPerson } from 'react-icons/md'
 import { Player } from 'src/models/player'
+import { User } from 'src/models/serverModels/User'
 import Card from '../card'
 
 interface LobbyPlayerProps {
-  players: Player[]
+  players: User[]
 }
 
 const LobbyPlayers: FunctionComponent<LobbyPlayerProps> = ({ players }) => {
@@ -16,9 +17,12 @@ const LobbyPlayers: FunctionComponent<LobbyPlayerProps> = ({ players }) => {
       <div className="grid md:grid-cols-2 gap-6">
         {players.map(p => {
           return (
-            <Card key={p.displayName} className=" p-5 flex justify-between items-center text-2xl">
+            <Card
+              key={p.uid}
+              className=" p-5 flex justify-between items-center text-2xl"
+            >
               <p>{p.displayName}</p>
-              <MdPerson size={24}/>
+              <MdPerson size={24} />
             </Card>
           )
         })}
