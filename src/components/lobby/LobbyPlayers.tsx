@@ -2,13 +2,20 @@ import React, { FunctionComponent } from 'react'
 import { MdPerson } from 'react-icons/md'
 import { Player } from 'src/models/player'
 import { User } from 'src/models/serverModels/User'
+import { useAuth } from 'src/providers/AuthProvider'
 import Card from '../card'
 
 interface LobbyPlayerProps {
   players: User[]
+  hostId: string
 }
 
-const LobbyPlayers: FunctionComponent<LobbyPlayerProps> = ({ players }) => {
+const LobbyPlayers: FunctionComponent<LobbyPlayerProps> = ({
+  players,
+  hostId,
+}) => {
+  const { user } = useAuth()
+
   return (
     <div>
       <h2 className=" text-3xl text-theme-orange font-semibold mb-8">
@@ -19,9 +26,14 @@ const LobbyPlayers: FunctionComponent<LobbyPlayerProps> = ({ players }) => {
           return (
             <Card
               key={p.uid}
-              className=" p-5 flex justify-between items-center text-2xl"
+              className={` p-5 flex justify-between items-center text-2xl ${
+                p.uid == hostId ? 'text-orange-800' : ''
+              } `}
             >
-              <p>{p.displayName}</p>
+              <p>
+                {p.displayName + ' '}
+                {user?.uid == p.uid ? <span>(You)</span> : null}
+              </p>
               <MdPerson size={24} />
             </Card>
           )

@@ -18,9 +18,10 @@ const Lobby = () => {
   const [loaded, setLoaded] = useState(false)
   useWarnLeaveLobby(router.query.id)
 
-  const { socket } = useAuth()
+  const { socket, user } = useAuth()
   const { joinLobby, leaveLobby } = useSockets()
 
+  const [hostId, setHostId] = useState('')
   const [players, setPlayers] = useState<User[]>([])
 
   const handleStartGameClick = () => {
@@ -33,8 +34,12 @@ const Lobby = () => {
     if (router.query.id && socket) {
       joinLobby(router.query.id as string)
       socket.on(SocketMessages.lobbyInfo, (data: GameRoom) => {
+        setHostId(data.hostId)
         const players = data.players.map(p => {
-          return { displayName: p.displayName ? p.displayName : 'Guest', id: p.uid }
+          return {
+            displayName: p.displayName ? p.displayName : 'Guest',
+            uid: p.uid,
+          }
         })
         if (mounted) {
           setPlayers(players)
@@ -49,7 +54,6 @@ const Lobby = () => {
 
   useEffect(() => {
     if (router) {
-
       setLoaded(true)
     }
   }, [router])
@@ -59,11 +63,17 @@ const Lobby = () => {
       <div className="flex flex-col justify-between h-full gap-8">
         <div className="grid gap-8">
           <PageTitle>Lobby</PageTitle>
-          <LobbyPlayers players={players} />
+          <LobbyPlayers players={players} hostId={hostId} />
         </div>
-        <Button onClick={handleStartGameClick} className=" max-w-md mx-auto">
-          START GAME
-        </Button>
+        {hostId == user?.uid ? (
+          <Button onClick={handleStartGameClick} className=" max-w-md mx-auto">
+            START GAME
+          </Button>
+        ) : (
+          <Button disabled onClick={handleStartGameClick} className=" max-w-md mx-auto">
+            Waiting for host...
+          </Button>
+        )}
       </div>
     </PageLayout>
   )
