@@ -22,6 +22,8 @@ import { createLogicalWrapper } from 'src/utils/logicalWrapper'
 import { useRouter } from 'next/router'
 import { io, Socket } from 'socket.io-client'
 
+
+
 export enum FirebaseError {
   wrongPassword = 'auth/wrong-password',
   userNotFound = 'auth/user-not-found',
@@ -91,6 +93,7 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
 
     // console.log(auth.currentUser);
 
+    
     restoreAuth().then(data => {
       if (mounted) {
         createWebSocket(data.token)
@@ -105,7 +108,8 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
   }, [])
 
   const createWebSocket = (token: string) => {
-    const newSocket = io('http://192.168.0.165:3001', {
+    const url = process.env.NEXT_PUBLIC_BACKEND || 'http://localhost:3001'
+    const newSocket = io(url, {
       auth: {
         token: `Bearer ${token}`,
       },
@@ -116,6 +120,9 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
     })
 
     setSocket(newSocket)
+
+    console.log("NEW SOCKET", newSocket);
+    
 
     console.log('creating new socket connection')
   }

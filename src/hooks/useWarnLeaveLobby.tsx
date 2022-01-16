@@ -44,5 +44,5 @@ export const useWarnLeaveLobby = (
       window.removeEventListener('beforeunload', beforeunload)
       Router.events.off('routeChangeStart', routeChangeStart)
     }
-  }, [lobbyId])
+  }, [lobbyId, socket])
 }

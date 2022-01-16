@@ -5,6 +5,7 @@ import {
   useEffect,
   useState,
 } from 'react'
+import { Socket } from 'socket.io-client'
 import { GameRoom } from 'src/models/serverModels/GameRoom'
 import { useAuth } from './AuthProvider'
 
@@ -38,14 +39,12 @@ export const SocketProvider: FunctionComponent = ({ children }) => {
 
         console.log(`received ${SocketMessages.activeRooms}`);
         console.log(data);
-        
-        
-        
         setActiveLobbies(data)
       })
     }
 
-    console.log(socket)
+    console.log(socket);
+    
   }, [socket])
 
   const joinLobby = async (lobbyId: string): Promise<boolean> => {
@@ -59,6 +58,7 @@ export const SocketProvider: FunctionComponent = ({ children }) => {
   }
 
   const leaveLobby = (lobbyId: string): Promise<boolean> => {
+    
     return new Promise((resolve, reject) => {
       if (socket) {
         socket.emit(SocketMessages.leaveLobby, lobbyId)

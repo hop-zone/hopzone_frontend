@@ -16,13 +16,12 @@ const Lobby = () => {
   const router = useRouter()
 
   const [loaded, setLoaded] = useState(false)
-  useWarnLeaveLobby(router.query.id)
-
   const { socket, user } = useAuth()
   const { joinLobby, leaveLobby } = useSockets()
-
   const [hostId, setHostId] = useState('')
   const [players, setPlayers] = useState<User[]>([])
+
+  useWarnLeaveLobby(router.query.id)
 
   const handleStartGameClick = () => {
     router.push('/gamesession')
