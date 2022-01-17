@@ -4,6 +4,7 @@ import Button from 'src/components/forms/Button'
 import PageLayout from 'src/components/layout'
 import LobbyPlayers from 'src/components/lobby/LobbyPlayers'
 import PageTitle from 'src/components/text/PageTitle'
+import TestMultiplayer from 'src/game/testMultiplayer'
 import useLeaveLobbyPrompt from 'src/hooks/useLeaveLobbyPrompt'
 import { useWarnLeaveLobby } from 'src/hooks/useWarnLeaveLobby'
 import { Player } from 'src/models/player'
@@ -17,14 +18,17 @@ const Lobby = () => {
 
   const [loaded, setLoaded] = useState(false)
   const { socket, user } = useAuth()
-  const { joinLobby, leaveLobby } = useSockets()
+  const { joinLobby, gameState } = useSockets()
   const [hostId, setHostId] = useState('')
   const [players, setPlayers] = useState<User[]>([])
 
   useWarnLeaveLobby(router.query.id)
 
   const handleStartGameClick = () => {
-    router.push('/gamesession')
+    if (socket) {
+      console.log('sending start game request')
+      socket.emit('f2b_startGame', router.query.id as string)
+    }
   }
 
   useEffect(() => {
@@ -32,24 +36,26 @@ const Lobby = () => {
     setLoaded(false)
     if (router.query.id && socket) {
       joinLobby(router.query.id as string)
-      socket.on(SocketMessages.lobbyInfo, (data: GameRoom) => {
-        setHostId(data.hostId)
-        const players = data.players.map(p => {
-          return {
-            displayName: p.displayName ? p.displayName : 'Guest',
-            uid: p.uid,
-          }
-        })
-        if (mounted) {
-          setPlayers(players)
-        }
-      })
     }
 
     return () => {
       mounted = false
     }
   }, [socket])
+
+  useEffect(() => {
+    if (gameState) {
+      setHostId(gameState.hostId)
+      const players = gameState.players.map(p => {
+        return {
+          displayName: p.displayName ? p.displayName : 'Guest',
+          uid: p.uid,
+        }
+      })
+
+      setPlayers(players)
+    }
+  }, [gameState])
 
   useEffect(() => {
     if (router) {
@@ -59,7 +65,7 @@ const Lobby = () => {
 
   return (
     <PageLayout>
-      <div className="flex flex-col justify-between h-full gap-8">
+      {!gameState?.hasStarted? <div className="flex flex-col justify-between h-full gap-8">
         <div className="grid gap-8">
           <PageTitle>Lobby</PageTitle>
           <LobbyPlayers players={players} hostId={hostId} />
@@ -69,11 +75,16 @@ const Lobby = () => {
             START GAME
           </Button>
         ) : (
-          <Button disabled onClick={handleStartGameClick} className=" max-w-md mx-auto">
+          <Button
+            disabled
+            onClick={handleStartGameClick}
+            className=" max-w-md mx-auto"
+          >
             Waiting for host...
           </Button>
         )}
-      </div>
+      </div>: <TestMultiplayer gameState={JSON.parse(gameState.game)}/>}
+      
     </PageLayout>
   )
 }

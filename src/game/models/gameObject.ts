@@ -35,7 +35,7 @@ export class GameObject {
         this.y = yPos
         this.id = Math.floor(Math.random() * 10000)
 
-        this.color = Math.random() * 255
+        this.color = 255
     }
 
     updatePosition(x: number, y: number){
