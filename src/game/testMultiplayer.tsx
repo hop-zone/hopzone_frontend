@@ -46,7 +46,7 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
 
   const draw = (p5: p5Types) => {
     const players = gameState.players.map(p => {
-      return new Player(p.x, p.y, p.uid)
+      return new Player(p.x, p.y, p.uid, p.highestPosition)
     })
 
     const platforms = gameState.platforms.map(p => {
@@ -73,6 +73,7 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
     let bottomBorder = canvasHeight - translatedY
 
     if (player) {
+      player.showBarrier(p5)
       if (player.topLeft.x < leftBorder + 100) {
         setTranslatedX(-player.topLeft.x + 100)
       }
@@ -82,8 +83,8 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
       if (player.topLeft.y < topBorder + 100) {
         setTranslatedY(-player.topLeft.y + 100)
       }
-      if (player.bottomRight.y > bottomBorder) {
-        setTranslatedY(-player.bottomRight.y + canvasHeight)
+      if (player.bottomRight.y > bottomBorder - 100) {
+        setTranslatedY(-player.bottomRight.y - 100 + canvasHeight)
       }
     }
   }
