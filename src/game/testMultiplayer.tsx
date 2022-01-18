@@ -32,6 +32,7 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
   //   useGameState()
 
   const { moveLeft, moveRight, stopMoving } = useSockets()
+  const { user } = useAuth()
 
   const [canvasWidth, setCanvasWidth] = useState(1280 - 32)
   const [canvasHeight, setCanvasHeight] = useState(720)
@@ -47,9 +48,8 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
   }
 
   const draw = (p5: p5Types) => {
-
     const players = gameState.players.map(p => {
-      return new Player(p.x, p.y)
+      return new Player(p.x, p.y, p.uid)
     })
 
     const platforms = gameState.platforms.map(p => {
@@ -66,24 +66,31 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
       p.show(p5)
     })
 
-    const player = players[0]
+    const player = players.find(p => {
+      return p.uid == user?.uid
+    })
+
+    console.log(players);
+    
 
     let leftBorder = -translatedX
     let rightBorder = canvasWidth - translatedX
     let topBorder = -translatedY
     let bottomBorder = canvasHeight - translatedY
 
-    if (player.topLeft.x < leftBorder + 100) {
-      setTranslatedX(-player.topLeft.x + 100)
-    }
-    if (player.bottomRight.x > rightBorder - 100) {
-      setTranslatedX(-player.bottomRight.x + canvasWidth - 100)
-    }
-    if (player.topLeft.y < topBorder + 100) {
-      setTranslatedY(-player.topLeft.y + 100)
-    }
-    if (player.bottomRight.y > bottomBorder) {
-      setTranslatedY(-player.bottomRight.y + canvasHeight)
+    if (player) {
+      if (player.topLeft.x < leftBorder + 100) {
+        setTranslatedX(-player.topLeft.x + 100)
+      }
+      if (player.bottomRight.x > rightBorder - 100) {
+        setTranslatedX(-player.bottomRight.x + canvasWidth - 100)
+      }
+      if (player.topLeft.y < topBorder + 100) {
+        setTranslatedY(-player.topLeft.y + 100)
+      }
+      if (player.bottomRight.y > bottomBorder) {
+        setTranslatedY(-player.bottomRight.y + canvasHeight)
+      }
     }
     // updateGameState()
   }

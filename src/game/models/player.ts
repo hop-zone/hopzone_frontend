@@ -10,6 +10,14 @@ export class Player extends GameObject {
     ySpeed: number = 0
     maxSpeed: number = 15
     movementSpeed: number = 10
+    uid: string
+
+
+    constructor(xPos: number, yPos: number, uid: string){
+        super(xPos, yPos)
+
+        this.uid = uid
+    }
 
     show(p5: p5Types) {
         p5.fill(this.color)
