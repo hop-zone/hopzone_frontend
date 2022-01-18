@@ -83,7 +83,7 @@ const Lobby = () => {
             Waiting for host...
           </Button>
         )}
-      </div>: <TestMultiplayer gameState={JSON.parse(gameState.game)}/>}
+      </div>: <TestMultiplayer gameState={gameState.game!}/>}
       
     </PageLayout>
   )

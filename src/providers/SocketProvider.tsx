@@ -48,6 +48,8 @@ export const SocketProvider: FunctionComponent = ({ children }) => {
       })
 
       socket.on(SocketMessages.gameState, (data: GameRoom) => {
+        // console.log(data);
+        
         setGameState(data)
       })
     }
