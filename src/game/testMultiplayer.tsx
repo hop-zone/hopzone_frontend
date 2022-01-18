@@ -28,9 +28,6 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
 }) => {
   const parentRef = useRef<HTMLDivElement>(null)
 
-  // const { state, updateGameState, moveLeft, moveRight, stopMoving } =
-  //   useGameState()
-
   const { moveLeft, moveRight, stopMoving } = useSockets()
   const { user } = useAuth()
 
@@ -70,9 +67,6 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
       return p.uid == user?.uid
     })
 
-    console.log(players);
-    
-
     let leftBorder = -translatedX
     let rightBorder = canvasWidth - translatedX
     let topBorder = -translatedY
@@ -92,7 +86,6 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
         setTranslatedY(-player.bottomRight.y + canvasHeight)
       }
     }
-    // updateGameState()
   }
 
   const keyPressed = (p5: p5Types) => {

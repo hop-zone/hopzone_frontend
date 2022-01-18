@@ -5,13 +5,10 @@ import PageLayout from 'src/components/layout'
 import LobbyPlayers from 'src/components/lobby/LobbyPlayers'
 import PageTitle from 'src/components/text/PageTitle'
 import TestMultiplayer from 'src/game/testMultiplayer'
-import useLeaveLobbyPrompt from 'src/hooks/useLeaveLobbyPrompt'
 import { useWarnLeaveLobby } from 'src/hooks/useWarnLeaveLobby'
-import { Player } from 'src/models/player'
-import { GameRoom } from 'src/models/serverModels/GameRoom'
 import { User } from 'src/models/serverModels/User'
 import { useAuth } from 'src/providers/AuthProvider'
-import { SocketMessages, useSockets } from 'src/providers/SocketProvider'
+import { useSockets } from 'src/providers/SocketProvider'
 
 const Lobby = () => {
   const router = useRouter()
