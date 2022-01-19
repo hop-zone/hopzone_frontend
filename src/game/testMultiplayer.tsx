@@ -36,35 +36,67 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
   const [translatedX, setTranslatedX] = useState(canvasWidth / 2 + 50)
   const [translatedY, setTranslatedY] = useState(canvasHeight)
 
+  const [images, setImages] = useState<p5Types.Image[]>([])
+  const [platformImages, setPlatformImages] = useState<p5Types.Image[]>([])
+
+  const preload = (p5: p5Types) => {
+    const platformImg = p5.loadImage('/img/platform_static.png')
+    const playerImg = p5.loadImage('/img/character.png')
+    const backgroundImage = p5.loadImage('/img/bg_texture.png')
+
+    const orangeCharacter = p5.loadImage('/img/character_orange.png')
+    const prupleCharacter = p5.loadImage('/img/character_purple.png')
+    const greenCharacter = p5.loadImage('/img/character_green.png')
+    const blueCharacter = p5.loadImage('/img/character_blue.png')
+
+    const platform_0 = p5.loadImage('/img/platform_0.png')
+    const platform_1 = p5.loadImage('/img/platform_1.png')
+    const platform_2 = p5.loadImage('/img/platform_2.png')
+
+    setImages([platformImg, playerImg, backgroundImage, orangeCharacter, prupleCharacter, greenCharacter, blueCharacter])
+
+    setPlatformImages([platform_0, platform_1, platform_2])
+  }
   const setup = (p5: p5Types, canvasParentRef: Element) => {
     setCanvasWidth(canvasParentRef.clientWidth)
     p5.createCanvas(canvasParentRef.clientWidth, canvasHeight).parent(
       canvasParentRef,
     )
     p5.rectMode(p5.CENTER)
+    p5.imageMode(p5.CENTER)
   }
 
   const draw = (p5: p5Types) => {
     const players = gameState.players.map(p => {
-      return new Player(p.x, p.y, p.uid, p.highestPosition)
+      return new Player(p.x, p.y, p.uid, p.displayName, p.highestPosition, p.xSpeed)
     })
 
     const platforms = gameState.platforms.map(p => {
-      return new Platform(p.x, p.y)
-    })
-
-    p5.translate(translatedX, translatedY)
-    p5.background(0)
-    platforms.forEach(platform => {
-      platform.show(p5)
-    })
-
-    players.forEach(p => {
-      p.show(p5)
+      return new Platform(p.x, p.y, p.platformType)
     })
 
     const player = players.find(p => {
       return p.uid == user?.uid
+    })
+
+    p5.translate(translatedX / 10, translatedY / 10)
+
+    p5.imageMode(p5.CENTER)
+    const imageSize = 1500
+    for (let i = -1; i < 2; i++) {
+      for (let j = 0; j < 3; j++) {
+        p5.image(images[2], i * imageSize, j * -imageSize, imageSize ,imageSize)
+      }
+    }
+    p5.translate(-translatedX / 10, -translatedY / 10)
+
+    p5.translate(translatedX, translatedY)
+    platforms.forEach(platform => {
+      platform.show(p5, platformImages[platform.platformType])
+    })
+
+    players.forEach((p, i) => {
+      p.show(p5, images[i + 3])
     })
 
     let leftBorder = -translatedX
@@ -87,6 +119,16 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
         setTranslatedY(-player.bottomRight.y - 100 + canvasHeight)
       }
     }
+
+    // p5.translate(-translatedX, -translatedY)
+    // players.map((p, i) => {
+    //   p5.textAlign(p5.LEFT)
+    //   p5.fill(255)
+    //   p5.image(images[1], p.width, p.height * (i + 1), p.width, p.height)
+
+    //   const highestPosition = Math.round(Math.abs(p.highestPosition))
+    //   p5.text(highestPosition, p.width + p.width / 1.5, p.height * (i + 1))
+    // })
   }
 
   const keyPressed = (p5: p5Types) => {
@@ -120,6 +162,7 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
       {parentRef != null ? (
         <Sketch
           className="block mx-auto"
+          preload={preload}
           setup={setup}
           draw={draw}
           keyPressed={keyPressed}
