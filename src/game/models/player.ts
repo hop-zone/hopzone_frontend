@@ -13,17 +13,19 @@ export class Player extends GameObject {
     displayName: string
     uid: string
     highestPosition: number
+    playerNum: number
     get deathBarrierYpos() {
         return this.highestPosition + 1000
     }
 
 
-    constructor(xPos: number, yPos: number, uid: string, displayName?: string, highestPosition?: number, xSpeed?: number) {
+    constructor(xPos: number, yPos: number, uid: string, playerNum: number, displayName?: string, highestPosition?: number, xSpeed?: number) {
         super(xPos, yPos)
         this.highestPosition = highestPosition || 0
         this.displayName = displayName || 'Guest'
         this.uid = uid
         this.xSpeed = xSpeed || 0
+        this.playerNum = playerNum
     }
 
     show(p5: p5Types, image: p5Types.Image) {
@@ -36,13 +38,13 @@ export class Player extends GameObject {
         if (this.xSpeed >= 0) {
             p5.image(image, this.x, this.y, this.width, this.height)
         } else {
+            p5.push()
             p5.scale(-1, 1)
             p5.image(image, -this.x, this.y, this.width, this.height)
-
-            
+            p5.pop()
         }
 
-        p5.scale(1,1)
+        
     }
 
     showBarrier(p5: p5Types) {

@@ -11,14 +11,16 @@ export class PlayerObject extends GameObject {
     uid: string
     displayName: string
     highestPosition: number
+    playerNum: number
     get deathBarrierYpos() {
         return this.highestPosition + 500
     }
 
-    constructor(xPos: number, yPos: number, uid: string, displayName: string, highestPosition?: number) {
+    constructor(xPos: number, yPos: number, uid: string, playerNum: number, displayName: string, highestPosition?: number) {
 
         super(xPos, yPos)
         this.maxSpeed = 15
+        this.playerNum = playerNum
         this.movementSpeed = 10
         this.width = 50
         this.height = 50
