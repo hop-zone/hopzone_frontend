@@ -191,6 +191,7 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
     sorted.map((p, i) => {
       const img = scoreboardImages[i]
       p5.push()
+      p5.scale(0.8)
       if(i == 0) {
         p5.scale(1.2)
       }

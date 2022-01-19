@@ -3,9 +3,7 @@ import Router from 'next/router'
 import { useAuth } from 'src/providers/AuthProvider'
 import { SocketMessages, useSockets } from 'src/providers/SocketProvider'
 
-export const useWarnLeaveLobby = (
-  lobbyId: string | string[] | undefined,
-) => {
+export const useWarnLeaveLobby = (lobbyId: string | string[] | undefined) => {
   const message = 'Do you want to leave?'
 
   const { socket } = useAuth()
@@ -13,17 +11,16 @@ export const useWarnLeaveLobby = (
 
   useEffect(() => {
     const routeChangeStart = (url: string) => {
-      if (Router.asPath !== url && lobbyId && !confirm(message)) {
-        Router.events.emit('routeChangeError')
-        Router.push({
-          pathname: Router.pathname,
-          query: Router.query,
-        })
+      // if (Router.asPath !== url && lobbyId && !confirm(message)) {
+      //   Router.events.emit('routeChangeError')
+      //   Router.push({
+      //     pathname: Router.pathname,
+      //     query: Router.query,
+      //   })
 
-        throw 'Abort route change. Please ignore this error.'
-      } else {
-        leaveLobby(lobbyId as string)
-      }
+      //   throw 'Abort route change. Please ignore this error.'
+      // } else {
+      leaveLobby(lobbyId as string)
     }
 
     const beforeunload = (e: {
