@@ -22,13 +22,13 @@ import { createLogicalWrapper } from 'src/utils/logicalWrapper'
 import { useRouter } from 'next/router'
 import { io, Socket } from 'socket.io-client'
 
-
-
 export enum FirebaseError {
   wrongPassword = 'auth/wrong-password',
   userNotFound = 'auth/user-not-found',
   tooManyRequests = 'auth/too-many-requests',
   weakPassword = 'auth/weak-password',
+  emailInUse = 'auth/email-already-in-use',
+  invalidEmail = 'auth/invalid-email'
 }
 
 interface IAuthContext {
@@ -91,9 +91,6 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
   useEffect(() => {
     let mounted = true
 
-    // console.log(auth.currentUser);
-
-    
     restoreAuth().then(data => {
       if (mounted) {
         createWebSocket(data.token)
@@ -105,7 +102,7 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
     return () => {
       mounted = false
     }
-  }, [])
+  }, [user])
 
   const createWebSocket = (token: string) => {
     const url = process.env.NEXT_PUBLIC_BACKEND || 'http://localhost:3001'
@@ -121,9 +118,7 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
 
     setSocket(newSocket)
 
-    console.log("NEW SOCKET", newSocket);
-    
-
+    console.log('NEW SOCKET', newSocket)
     console.log('creating new socket connection')
   }
 
@@ -175,9 +170,11 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
       try {
         createUserWithEmailAndPassword(auth, email, password)
           .then(async userCredential => {
-            changeUserDisplayName(username, userCredential.user)
-            setUser({ ...userCredential.user, displayName: username })
-            resolve({ success: true })
+
+            await changeUserDisplayName(username, userCredential.user)
+            await login(email, password).then(r => {
+              resolve({ success: true })
+            })
           })
           .catch(error => {
             const errorCode = error.code
@@ -199,6 +196,8 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
         displayName: username,
       })
         .then(value => {
+          console.log(value)
+
           resolve(true)
         })
         .catch(e => {

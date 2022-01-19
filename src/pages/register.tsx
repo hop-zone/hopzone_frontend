@@ -60,10 +60,26 @@ const Register = () => {
         router.push('/')
       })
       .catch((e: LoginResponse) => {
+
+        console.log(e);
+        
         if (e.errCode == FirebaseError.weakPassword) {
           setLoading(false)
           formItems[2].isFaulty = true
           formItems[2].error = 'Password too weak'
+          setItems(formItems)
+        }
+
+        if(e.errCode == FirebaseError.emailInUse){
+          setLoading(false)
+          formItems[1].isFaulty = true
+          formItems[1].error = 'Email already in use'
+          setItems(formItems)
+        }
+        if(e.errCode == FirebaseError.invalidEmail){
+          setLoading(false)
+          formItems[1].isFaulty = true
+          formItems[1].error = 'Invalid email'
           setItems(formItems)
         }
       })

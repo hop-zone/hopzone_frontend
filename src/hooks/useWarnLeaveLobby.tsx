@@ -15,7 +15,7 @@ export const useWarnLeaveLobby = (
     const routeChangeStart = (url: string) => {
       if (Router.asPath !== url && lobbyId && !confirm(message)) {
         Router.events.emit('routeChangeError')
-        Router.replace({
+        Router.push({
           pathname: Router.pathname,
           query: Router.query,
         })
