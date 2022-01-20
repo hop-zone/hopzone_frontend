@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 import { MdPerson } from 'react-icons/md'
@@ -10,7 +11,10 @@ const AppHeader = () => {
     <nav className="bg-gradient-to-r from-theme-lightpurple to-theme-orange ">
       <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between">
         <Link href={'/'}>
-          <a>Hopzone</a>
+          <a className='flex items-center gap-2'>
+            <Image src={'/img/head_orange.png'} width={32} height={32} />
+            <span>Hopzone</span>
+          </a>
         </Link>
 
         <Authenticated>

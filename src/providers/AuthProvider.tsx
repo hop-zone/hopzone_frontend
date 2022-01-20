@@ -20,16 +20,20 @@ import {
 } from 'firebase/auth'
 import { createLogicalWrapper } from 'src/utils/logicalWrapper'
 import { useRouter } from 'next/router'
+import { io, Socket } from 'socket.io-client'
 
 export enum FirebaseError {
   wrongPassword = 'auth/wrong-password',
   userNotFound = 'auth/user-not-found',
   tooManyRequests = 'auth/too-many-requests',
   weakPassword = 'auth/weak-password',
+  emailInUse = 'auth/email-already-in-use',
+  invalidEmail = 'auth/invalid-email'
 }
 
 interface IAuthContext {
   user: User | null
+  socket: Socket | undefined
   restoreAuth: () => Promise<{ state: User; token: string }>
   register: (
     email: string,
@@ -75,6 +79,7 @@ export const NotAuthenticated = createLogicalWrapper(
 
 export const AuthProvider: FunctionComponent = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
+  const [socket, setSocket] = useState<Socket>()
   const [loaded, setLoaded] = useState(false)
   const [signedIn, setSignedIn] = useState(false)
 
@@ -86,12 +91,10 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
   useEffect(() => {
     let mounted = true
 
-    // console.log(auth.currentUser);
-
     restoreAuth().then(data => {
       if (mounted) {
+        createWebSocket(data.token)
         setUser(data.state)
-
         setSignedIn(true)
       }
     })
@@ -99,13 +102,32 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
     return () => {
       mounted = false
     }
-  }, [])
+  }, [user])
+
+  const createWebSocket = (token: string) => {
+    const url = process.env.NEXT_PUBLIC_BACKEND || 'http://localhost:3001'
+    const newSocket = io(url, {
+      auth: {
+        token: `Bearer ${token}`,
+      },
+    })
+
+    newSocket.on('connect_error', data => {
+      console.log(data)
+    })
+
+    setSocket(newSocket)
+
+    console.log('NEW SOCKET', newSocket)
+    console.log('creating new socket connection')
+  }
 
   const signInAsGuest = (): Promise<LoginResponse> => {
     return new Promise((resolve, reject) => {
       try {
         signInAnonymously(auth)
           .then(async userCredential => {
+            createWebSocket(await userCredential.user.getIdToken())
             setUser(userCredential.user)
             setSignedIn(true)
             resolve({ success: true })
@@ -148,9 +170,11 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
       try {
         createUserWithEmailAndPassword(auth, email, password)
           .then(async userCredential => {
-            changeUserDisplayName(username, userCredential.user)
-            setUser({ ...userCredential.user, displayName: username })
-            resolve({ success: true })
+
+            await changeUserDisplayName(username, userCredential.user)
+            await login(email, password).then(r => {
+              resolve({ success: true })
+            })
           })
           .catch(error => {
             const errorCode = error.code
@@ -172,6 +196,8 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
         displayName: username,
       })
         .then(value => {
+          console.log(value)
+
           resolve(true)
         })
         .catch(e => {
@@ -185,6 +211,7 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
     return new Promise((resolve, reject) => {
       signInWithEmailAndPassword(auth, email, password)
         .then(async userCredential => {
+          createWebSocket(await userCredential.user.getIdToken())
           setUser(userCredential.user)
           setSignedIn(true)
           resolve({ success: true })
@@ -200,6 +227,7 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
     return new Promise((resolve, reject) => {
       signOut(auth)
         .then(() => {
+          socket?.disconnect()
           setUser(null)
           setSignedIn(false)
           resolve(true)
@@ -219,6 +247,7 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
     logout,
     signedIn,
     signInAsGuest,
+    socket,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

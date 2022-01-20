@@ -3,6 +3,7 @@ import React, { FunctionComponent, useEffect, useState } from 'react'
 import { useAuth } from 'src/providers/AuthProvider'
 import AppFooter from './AppFooter'
 import AppHeader from './AppHeader'
+import Image from 'next/image'
 
 const PageLayout: FunctionComponent = ({ children }) => {
   return (

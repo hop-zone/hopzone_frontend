@@ -1,5 +1,3 @@
-import p5Types from 'p5'
-
 interface Point {
     x: number,
     y: number
@@ -17,17 +15,17 @@ export class GameObject {
     color: number
 
     get topLeft(): Point {
-        const x = this.x - this.width/2
-        const y = this.y - this.height/2
+        const x = this.x - this.width / 2
+        const y = this.y - this.height / 2
 
-        return {x: x, y: y}
+        return { x: x, y: y }
     }
 
     get bottomRight(): Point {
-        const x = this.x + this.width/2
-        const y = this.y + this.height/2
+        const x = this.x + this.width / 2
+        const y = this.y + this.height / 2
 
-        return {x: x, y: y}
+        return { x: x, y: y }
     }
 
     constructor(xPos: number, yPos: number) {
@@ -35,10 +33,10 @@ export class GameObject {
         this.y = yPos
         this.id = Math.floor(Math.random() * 10000)
 
-        this.color = 255
+        this.color = Math.random() * 255
     }
 
-    updatePosition(x: number, y: number){
+    updatePosition(x: number, y: number) {
         this.x = x
         this.y = y
     }
@@ -46,11 +44,11 @@ export class GameObject {
     intersects(other: GameObject): boolean {
 
         //no horizontal overlap
-        if(this.topLeft.x >= other.bottomRight.x || other.topLeft.x >= this.bottomRight.x) return false
+        if (this.topLeft.x >= other.bottomRight.x || other.topLeft.x >= this.bottomRight.x) return false
 
         //no vertical overlap
-        if(this.topLeft.y >= other.bottomRight.y || other.topLeft.y >= this.bottomRight.y) return false
-        
+        if (this.topLeft.y >= other.bottomRight.y || other.topLeft.y >= this.bottomRight.y) return false
+
         return true
     }
 }

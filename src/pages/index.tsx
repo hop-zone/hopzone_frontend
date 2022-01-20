@@ -10,16 +10,42 @@ import PageTitle from 'src/components/text/PageTitle'
 import SubTitle from 'src/components/text/SubTitle'
 import { Authenticated, useAuth } from 'src/providers/AuthProvider'
 
+import io, { Socket } from 'socket.io-client'
+import { SocketMessages } from 'src/providers/SocketProvider'
+import { GameRoom } from 'src/models/serverModels/GameRoom'
+
+const ENDPOINT = 'http://localhost:3001'
+
 const Home: NextPage = () => {
   const router = useRouter()
 
+  const { socket } = useAuth()
+
+  const handleCreatLobbyClick = () => {
+    socket?.emit('f2b_newLobby')
+  }
   const handleSingleplayerClick = () => {
     router.push('/gamesession')
   }
 
-  const handleCreateGameClick = () => {
-    router.push('/lobby')
+  const handleJoinLobby = (data: GameRoom) => {
+    console.log('pushing')
+
+    console.log(data);
+    
+    router.push(`/lobby?id=${data.roomId}`)
   }
+
+  useEffect(() => {
+    if (socket) {
+      socket.on(SocketMessages.lobbyInfo, handleJoinLobby)
+    }
+
+    return () => {
+      // socket?.disconnect()
+      socket?.off(SocketMessages.lobbyInfo, handleJoinLobby)
+    }
+  }, [socket])
 
   return (
     <PageLayout>
@@ -45,7 +71,7 @@ const Home: NextPage = () => {
             <div className="flex flex-col justify-between min-h-full max-h-96 max-w-md mx-auto">
               <SubTitle className="text-center">Quick Join</SubTitle>
               <QuickJoinMenu />
-              <Button onClick={handleCreateGameClick}>CREATE NEW</Button>
+              <Button onClick={handleCreatLobbyClick}>CREATE NEW</Button>
             </div>
           </div>
         </Card>
