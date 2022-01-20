@@ -3,6 +3,7 @@ import { PlayerObject } from "./gameObjects/PlayerObject";
 
 export interface Game {
     players: PlayerObject[]
-    deadPlayers: PlayerObject[]
     platforms: Platform[]
+    alivePlayers: number
+    deadPlayers: number
 }

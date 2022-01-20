@@ -8,12 +8,12 @@ import TestMultiplayer from 'src/game/testMultiplayer'
 import { useWarnLeaveLobby } from 'src/hooks/useWarnLeaveLobby'
 import { User } from 'src/models/serverModels/User'
 import { useAuth } from 'src/providers/AuthProvider'
-import { useSockets } from 'src/providers/SocketProvider'
+import { SocketMessages, useSockets } from 'src/providers/SocketProvider'
 
 const Lobby = () => {
   const router = useRouter()
 
-  const [loaded, setLoaded] = useState(false)
+  const [gameLoading, setGameLoading] = useState(false)
   const { socket, user } = useAuth()
   const { joinLobby, gameState } = useSockets()
   const [hostId, setHostId] = useState('')
@@ -29,14 +29,12 @@ const Lobby = () => {
   }
 
   useEffect(() => {
-    let mounted = true
-    setLoaded(false)
     if (router.query.id && socket) {
       joinLobby(router.query.id as string)
-    }
 
-    return () => {
-      mounted = false
+      socket.on(SocketMessages.gameLoading, () => {
+        setGameLoading(true)
+      })
     }
   }, [socket])
 
@@ -51,37 +49,38 @@ const Lobby = () => {
       })
 
       setPlayers(players)
+      setGameLoading(false)
     }
   }, [gameState])
 
-  useEffect(() => {
-    if (router) {
-      setLoaded(true)
-    }
-  }, [router])
-
   return (
     <PageLayout>
-      {!gameState?.hasStarted? <div className="flex flex-col justify-between h-full gap-8">
-        <div className="grid gap-8">
-          <PageTitle>Lobby</PageTitle>
-          <LobbyPlayers players={players} hostId={hostId} />
+      {!gameState?.hasStarted ? (
+        <div className="flex flex-col justify-between h-full gap-8">
+          <div className="grid gap-8">
+            <PageTitle>Lobby</PageTitle>
+            <LobbyPlayers players={players} hostId={hostId} />
+          </div>
+          {!gameLoading ? (hostId == user?.uid ? (
+            <Button
+              onClick={handleStartGameClick}
+              className=" max-w-md mx-auto"
+            >
+              START GAME
+            </Button>
+          ) : (
+            <Button
+              disabled
+              onClick={handleStartGameClick}
+              className=" max-w-md mx-auto"
+            >
+              Waiting for host...
+            </Button>
+          )): <h1 className=' text-center text-orange-400 text-2xl'>Starting game...</h1>}
         </div>
-        {hostId == user?.uid ? (
-          <Button onClick={handleStartGameClick} className=" max-w-md mx-auto">
-            START GAME
-          </Button>
-        ) : (
-          <Button
-            disabled
-            onClick={handleStartGameClick}
-            className=" max-w-md mx-auto"
-          >
-            Waiting for host...
-          </Button>
-        )}
-      </div>: <TestMultiplayer gameState={gameState.game!}/>}
-      
+      ) : (
+        <TestMultiplayer gameState={gameState.game!} />
+      )}
     </PageLayout>
   )
 }

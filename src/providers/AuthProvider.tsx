@@ -112,14 +112,7 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
       },
     })
 
-    newSocket.on('connect_error', data => {
-      console.log(data)
-    })
-
     setSocket(newSocket)
-
-    console.log('NEW SOCKET', newSocket)
-    console.log('creating new socket connection')
   }
 
   const signInAsGuest = (): Promise<LoginResponse> => {

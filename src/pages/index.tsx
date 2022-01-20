@@ -9,10 +9,9 @@ import QuickJoinMenu from 'src/components/quickjoinmenu'
 import PageTitle from 'src/components/text/PageTitle'
 import SubTitle from 'src/components/text/SubTitle'
 import { Authenticated, useAuth } from 'src/providers/AuthProvider'
-
-import io, { Socket } from 'socket.io-client'
-import { SocketMessages } from 'src/providers/SocketProvider'
+import { SocketMessages, useSockets } from 'src/providers/SocketProvider'
 import { GameRoom } from 'src/models/serverModels/GameRoom'
+import ConnectionError from 'src/components/errors/ConnectionError'
 
 const ENDPOINT = 'http://localhost:3001'
 
@@ -20,6 +19,7 @@ const Home: NextPage = () => {
   const router = useRouter()
 
   const { socket } = useAuth()
+  const { connectionError } = useSockets()
 
   const handleCreatLobbyClick = () => {
     socket?.emit('f2b_newLobby')
@@ -31,8 +31,8 @@ const Home: NextPage = () => {
   const handleJoinLobby = (data: GameRoom) => {
     console.log('pushing')
 
-    console.log(data);
-    
+    console.log(data)
+
     router.push(`/lobby?id=${data.roomId}`)
   }
 
@@ -68,11 +68,18 @@ const Home: NextPage = () => {
             </Button>
           </div>
           <div className=" bg-purple-700 rounded-br-lg rounded-bl-lg md:rounded-bl-none md:rounded-tr-lg p-8">
-            <div className="flex flex-col justify-between min-h-full max-h-96 max-w-md mx-auto">
-              <SubTitle className="text-center">Quick Join</SubTitle>
-              <QuickJoinMenu />
-              <Button onClick={handleCreatLobbyClick}>CREATE NEW</Button>
-            </div>
+            {connectionError ? (
+              <div className=" flex flex-col items-center">
+                <SubTitle className="text-center">Quick Join</SubTitle>
+                <ConnectionError />
+              </div>
+            ) : (
+              <div className="flex flex-col justify-between min-h-full max-h-96 max-w-md mx-auto">
+                <SubTitle className="text-center">Quick Join</SubTitle>
+                <QuickJoinMenu />
+                <Button onClick={handleCreatLobbyClick}>CREATE NEW</Button>
+              </div>
+            )}
           </div>
         </Card>
       </Authenticated>

@@ -10,6 +10,8 @@ import { GameRoom } from 'src/models/serverModels/GameRoom'
 import { useAuth } from './AuthProvider'
 
 export enum SocketMessages {
+  connectionFailed = 'connect_error',
+  connectionSuccess = 'connect',
   activeRooms = 'b2f_gamerooms',
   lobbyInfo = 'b2f_lobby',
   joinLobby = 'f2b_joinLobby',
@@ -18,11 +20,14 @@ export enum SocketMessages {
   moveLeft = 'f2b_moveLeft',
   moveRight = 'f2b_moveRight',
   stopMoving = 'f2b_stopMoving',
+  gameLoading = 'b2f_gameLoading'
 }
 
 interface ISocketContext {
+  socket: Socket | undefined
   activeLobbies: GameRoom[] | undefined
   gameState: GameRoom | undefined
+  connectionError: boolean
   joinLobby: (lobbyId: string) => Promise<boolean>
   leaveLobby: (lobbyId: string) => Promise<boolean>
   moveLeft: () => Promise<boolean>
@@ -40,6 +45,7 @@ export const SocketProvider: FunctionComponent = ({ children }) => {
   const { socket } = useAuth()
   const [activeLobbies, setActiveLobbies] = useState<GameRoom[]>()
   const [gameState, setGameState] = useState<GameRoom>()
+  const [connectionError, setConnectionError] = useState(false)
 
   useEffect(() => {
     if (socket) {
@@ -49,8 +55,16 @@ export const SocketProvider: FunctionComponent = ({ children }) => {
 
       socket.on(SocketMessages.gameState, (data: GameRoom) => {
         // console.log(data);
-        
+
         setGameState(data)
+      })
+
+      socket.on(SocketMessages.connectionFailed, () => {
+        setConnectionError(true)
+      })
+
+      socket.on(SocketMessages.connectionSuccess, () => {
+        setConnectionError(false)
       })
     }
 
@@ -80,10 +94,7 @@ export const SocketProvider: FunctionComponent = ({ children }) => {
 
   const moveLeft = (): Promise<boolean> => {
     return new Promise((resolve, reject) => {
-      console.log('trying to move')
-
       if (socket) {
-        console.log('moving left')
         socket.emit(SocketMessages.moveLeft)
         resolve(true)
       } else {
@@ -114,6 +125,8 @@ export const SocketProvider: FunctionComponent = ({ children }) => {
 
   const value = {
     activeLobbies: activeLobbies,
+    socket,
+    connectionError,
     joinLobby,
     leaveLobby,
     gameState,

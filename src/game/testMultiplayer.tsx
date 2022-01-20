@@ -71,13 +71,13 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
     const fontRegular = p5.loadFont('/font/Kanit-Regular.ttf')
     const fontSemibold = p5.loadFont('/font/Kanit-SemiBold.ttf')
 
-    setImages([
-      platformImg,
-      playerImg,
-      backgroundImage,
-      cross
+    setImages([platformImg, playerImg, backgroundImage, cross])
+    setCharacterImages([
+      orangeCharacter,
+      prupleCharacter,
+      greenCharacter,
+      blueCharacter,
     ])
-    setCharacterImages([orangeCharacter, prupleCharacter, greenCharacter, blueCharacter])
     setPlatformImages([platform_0, platform_1, platform_2])
     setScoreboardImages([orangeHead, prupleHead, greenHead, blueHead])
     setFonts({ regular: fontRegular, semibold: fontSemibold })
@@ -93,6 +93,8 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
   }
 
   const draw = (p5: p5Types) => {
+    let spectating = false
+
     const players = gameState.players.map(p => {
       return new Player(
         p.x,
@@ -102,18 +104,7 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
         p.displayName,
         p.highestPosition,
         p.xSpeed,
-      )
-    })
-
-    const deadPlayers = gameState.deadPlayers.map(p => {
-      return new Player(
-        p.x,
-        p.y,
-        p.uid,
-        p.playerNum,
-        p.displayName,
-        p.highestPosition,
-        p.xSpeed,
+        p.isDead,
       )
     })
 
@@ -121,9 +112,16 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
       return new Platform(p.x, p.y, p.platformType)
     })
 
-    const player = players.find(p => {
+    let player = players.find(p => {
       return p.uid == user?.uid
     })
+
+    if (player?.isDead) {
+      player = players.find(p => {
+        return !p.isDead
+      })
+      spectating = true
+    }
 
     p5.push()
     p5.translate(translatedX / 10, translatedY / 10)
@@ -131,7 +129,7 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
     p5.imageMode(p5.CENTER)
     const imageSize = 1500
     for (let i = -1; i < 2; i++) {
-      for (let j = 0; j < 3; j++) {
+      for (let j = 0; j < 10; j++) {
         p5.image(images[2], i * imageSize, j * -imageSize, imageSize, imageSize)
       }
     }
@@ -144,7 +142,9 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
     })
 
     players.forEach((p, i) => {
-      p.show(p5, characterImages[p.playerNum])
+      if (!p.isDead) {
+        p.show(p5, characterImages[p.playerNum])
+      }
     })
 
     let leftBorder = -translatedX
@@ -169,10 +169,33 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
     }
 
     p5.pop()
-    showScoreBoard(p5, players, deadPlayers)
+
+    if (spectating && player) {
+      showSpectating(p5, player.displayName)
+    }
+
+    showScoreBoard(p5, players)
   }
 
-  const showScoreBoard = (p5: p5Types, alivePlayers: Player[], deadPlayers: Player[]) => {
+  const showSpectating = (p5: p5Types, playerName: string) => {
+    p5.push()
+    p5.fill(0, 0, 0, 50)
+    p5.rectMode('corner')
+    p5.rect(0, 0, canvasWidth, canvasHeight)
+    p5.translate(canvasWidth / 2, 0)
+    p5.textAlign(p5.CENTER)
+    p5.textFont(fonts?.semibold as object)
+    p5.textSize(64)
+    p5.fill(255)
+    p5.text('YOU DIED', 0, 100)
+    p5.textSize(24)
+    p5.textFont(fonts?.regular as object)
+    p5.text(`Now spectating ${playerName}`, 0, canvasHeight - 50)
+
+    p5.pop()
+  }
+
+  const showScoreBoard = (p5: p5Types, alivePlayers: Player[]) => {
     p5.push()
     p5.translate(20, 20)
 
@@ -192,18 +215,25 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
       const img = scoreboardImages[i]
       p5.push()
       p5.scale(0.8)
-      if(i == 0) {
+      if (i == 0) {
         p5.scale(1.2)
       }
       p5.translate(0, i * 100)
       p5.imageMode(p5.CORNER)
       p5.image(scoreboardImages[p.playerNum], 0, 0)
+      if (p.isDead) {
+        p5.image(images[3], 0, 0)
+      }
       p5.fill(255)
       p5.textSize(16)
       p5.text(p.displayName, img.width + 10, img.height - 10)
       p5.textSize(24)
       p5.textFont(fonts?.semibold as object)
-      p5.text(Math.round(Math.abs(p.highestPosition)), img.width + 10, img.height / 2)
+      p5.text(
+        Math.round(Math.abs(p.highestPosition)),
+        img.width + 10,
+        img.height / 2,
+      )
       p5.pop()
     })
     p5.pop()
@@ -211,16 +241,15 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
     p5.push()
     p5.translate(20, canvasHeight - 20)
 
-    deadPlayers.map((p, i) =>{
-      p5.push()
-      p5.scale(0.8)
-      p5.translate(0, i * -70)
-      p5.imageMode(p5.CORNER)
-      p5.image(scoreboardImages[p.playerNum], 0, -scoreboardImages[p.playerNum].height)
-      p5.image(images[3], 0, -scoreboardImages[p.playerNum].height)
-      p5.pop()
-    })
-
+    // deadPlayers.map((p, i) =>{
+    //   p5.push()
+    //   p5.scale(0.8)
+    //   p5.translate(0, i * -70)
+    //   p5.imageMode(p5.CORNER)
+    //   p5.image(scoreboardImages[p.playerNum], 0, -scoreboardImages[p.playerNum].height)
+    //   p5.image(images[3], 0, -scoreboardImages[p.playerNum].height)
+    //   p5.pop()
+    // })
   }
 
   const keyPressed = (p5: p5Types) => {
