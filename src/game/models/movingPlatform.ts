@@ -3,9 +3,9 @@ import p5Types from 'p5'
 
 export class MovingPlatform extends GameObject {
 
-    width: number = 120
+    width: number = 140
 
-    height: number = 30
+    height: number = 40
 
     originXpos: number;
 
@@ -21,10 +21,10 @@ export class MovingPlatform extends GameObject {
         this.xSpeed = xSpeed
     }
 
-    show = (p5: p5Types) => {
-        p5.fill(255)
+    show = (p5: p5Types, image: p5Types.Image) => {
+        p5.imageMode(p5.CENTER)
 
-        p5.rect(this.x, this.y, this.width, this.height)
+        p5.image(image, this.x, this.y, this.width, this.height)
     }
 
 }

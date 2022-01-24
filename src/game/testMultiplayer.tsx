@@ -48,6 +48,8 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
   const [platformImages, setPlatformImages] = useState<p5Types.Image[]>([])
   const [characterImages, setCharacterImages] = useState<p5Types.Image[]>([])
   const [scoreboardImages, setScoreboardImages] = useState<p5Types.Image[]>([])
+  const [cometImages, setCometImages] = useState<p5Types.Image[]>([])
+  const [firstAnimationImg, setFirstAnimationImg] = useState(false)
   const [fonts, setFonts] = useState<Fonts>()
 
   const preload = (p5: p5Types) => {
@@ -68,6 +70,10 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
     const platform_0 = p5.loadImage('/img/platform_0.png')
     const platform_1 = p5.loadImage('/img/platform_1.png')
     const platform_2 = p5.loadImage('/img/platform_2.png')
+    const platform_moving = p5.loadImage('/img/platform_moving.png')
+
+    const comet_1 = p5.loadImage('/img/comet_1.png')
+    const comet_2 = p5.loadImage('/img/comet_2.png')
 
     const cross = p5.loadImage('/img/cross.png')
 
@@ -81,9 +87,10 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
       greenCharacter,
       blueCharacter,
     ])
-    setPlatformImages([platform_0, platform_1, platform_2])
+    setPlatformImages([platform_0, platform_1, platform_2, platform_moving])
     setScoreboardImages([orangeHead, prupleHead, greenHead, blueHead])
     setFonts({ regular: fontRegular, semibold: fontSemibold })
+    setCometImages([comet_1, comet_2])
   }
   const setup = (p5: p5Types, canvasParentRef: Element) => {
     setCanvasWidth(canvasParentRef.clientWidth)
@@ -124,7 +131,7 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
     })
 
     const enemies = gameState.enemies.map(e => {
-      return new Enemy(e.x, e.y)
+      return new Enemy(e.x, e.y, e.ySpeed)
     })
 
     let player = players.find(p => {
@@ -157,15 +164,19 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
     })
 
     movingPlatforms.forEach(platform => {
-      platform.show(p5)
+      platform.show(p5, platformImages[3])
     })
 
     boostedPlatforms.forEach(platform => {
       platform.show(p5)
     })
 
+    if (p5.frameCount % 15 == 0) {
+      setFirstAnimationImg(!firstAnimationImg)
+    }
+
     enemies.forEach(enemy => {
-      enemy.show(p5)
+      enemy.show(p5, firstAnimationImg ? cometImages[0] : cometImages[1])
     })
 
     players.forEach((p, i) => {
@@ -187,11 +198,11 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
       if (player.bottomRight.x > rightBorder - 100) {
         setTranslatedX(-player.bottomRight.x + canvasWidth - 100)
       }
-      if (player.topLeft.y < topBorder + 100) {
-        setTranslatedY(-player.topLeft.y + 100)
+      if (player.topLeft.y < topBorder + 200) {
+        setTranslatedY(-player.topLeft.y + 200)
       }
-      if (player.bottomRight.y > bottomBorder - 100) {
-        setTranslatedY(-player.bottomRight.y - 100 + canvasHeight)
+      if (player.bottomRight.y > bottomBorder - 200) {
+        setTranslatedY(-player.bottomRight.y - 200 + canvasHeight)
       }
     }
 
@@ -267,16 +278,6 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
 
     p5.push()
     p5.translate(20, canvasHeight - 20)
-
-    // deadPlayers.map((p, i) =>{
-    //   p5.push()
-    //   p5.scale(0.8)
-    //   p5.translate(0, i * -70)
-    //   p5.imageMode(p5.CORNER)
-    //   p5.image(scoreboardImages[p.playerNum], 0, -scoreboardImages[p.playerNum].height)
-    //   p5.image(images[3], 0, -scoreboardImages[p.playerNum].height)
-    //   p5.pop()
-    // })
   }
 
   const keyPressed = (p5: p5Types) => {
