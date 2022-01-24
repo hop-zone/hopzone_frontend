@@ -16,6 +16,7 @@ import { Platform } from './models/platform'
 import { useAuth } from 'src/providers/AuthProvider'
 import { MovingPlatform } from './models/movingPlatform'
 import { BoostedPlatform } from './models/boostedPlatform'
+import { Enemy } from './models/enemy'
 
 const Sketch = dynamic(() => import('react-p5'), {
   ssr: false,
@@ -122,6 +123,10 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
       return new BoostedPlatform(p.x, p.y)
     })
 
+    const enemies = gameState.enemies.map(e => {
+      return new Enemy(e.x, e.y)
+    })
+
     let player = players.find(p => {
       return p.uid == user?.uid
     })
@@ -157,6 +162,10 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
 
     boostedPlatforms.forEach(platform => {
       platform.show(p5)
+    })
+
+    enemies.forEach(enemy => {
+      enemy.show(p5)
     })
 
     players.forEach((p, i) => {
