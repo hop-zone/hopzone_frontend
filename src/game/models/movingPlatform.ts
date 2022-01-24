@@ -3,9 +3,9 @@ import p5Types from 'p5'
 
 export class MovingPlatform extends GameObject {
 
-    width: number = 140
+    width: number = 150
 
-    height: number = 40
+    height: number = 45
 
     originXpos: number;
 

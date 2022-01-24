@@ -4,16 +4,16 @@ import p5Types from 'p5'
 
 export class BoostedPlatform extends GameObject {
 
-    width: number = 120
+    width: number = 150
 
-    height: number = 30
+    height: number = 80
 
     boostedSpeed: number = 25
 
-    show = (p5: p5Types) => {
-        p5.fill(255, 0, 0)
+    show = (p5: p5Types, image: p5Types.Image) => {
+        p5.imageMode(p5.CENTER)
 
-        p5.rect(this.x, this.y, this.width, this.height)
+        p5.image(image, this.x, this.y - 20, this.width, this.height)
     }
     
 }

@@ -71,6 +71,7 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
     const platform_1 = p5.loadImage('/img/platform_1.png')
     const platform_2 = p5.loadImage('/img/platform_2.png')
     const platform_moving = p5.loadImage('/img/platform_moving.png')
+    const platform_boosted = p5.loadImage('/img/platform_boosted.png')
 
     const comet_1 = p5.loadImage('/img/comet_1.png')
     const comet_2 = p5.loadImage('/img/comet_2.png')
@@ -87,7 +88,7 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
       greenCharacter,
       blueCharacter,
     ])
-    setPlatformImages([platform_0, platform_1, platform_2, platform_moving])
+    setPlatformImages([platform_0, platform_1, platform_2, platform_moving, platform_boosted])
     setScoreboardImages([orangeHead, prupleHead, greenHead, blueHead])
     setFonts({ regular: fontRegular, semibold: fontSemibold })
     setCometImages([comet_1, comet_2])
@@ -168,7 +169,7 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
     })
 
     boostedPlatforms.forEach(platform => {
-      platform.show(p5)
+      platform.show(p5, platformImages[4])
     })
 
     if (p5.frameCount % 15 == 0) {
