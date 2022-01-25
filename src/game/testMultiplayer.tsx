@@ -116,6 +116,7 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
         p.highestPosition,
         p.xSpeed,
         p.isDead,
+        p.score
       )
     })
 
@@ -239,8 +240,8 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
     p5.translate(20, 20)
 
     const sorted = alivePlayers.sort((a, b) => {
-      const score1 = Math.round(Math.abs(a.highestPosition))
-      const score2 = Math.round(Math.abs(b.highestPosition))
+      const score1 = a.score
+      const score2 = b.score
 
       if (score1 < score2) {
         return 1
@@ -269,7 +270,7 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
       p5.textSize(24)
       p5.textFont(fonts?.semibold as object)
       p5.text(
-        Math.round(Math.abs(p.highestPosition)),
+        p.score,
         img.width + 10,
         img.height / 2,
       )

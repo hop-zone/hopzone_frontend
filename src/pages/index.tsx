@@ -52,7 +52,7 @@ const Home: NextPage = () => {
       <Authenticated>
         <PageTitle className=" text-center">Hopzone</PageTitle>
         <SubTitle className="text-center">Can you hop the highest?</SubTitle>
-        <Card className="md:grid grid-cols-2">
+        <Card className="md:grid grid-cols-2 mb-8">
           <div className="p-8 max-w-xs mx-auto flex flex-col justify-between">
             <SubTitle className="text-center">Single Player</SubTitle>
             <p className=" mb-8">

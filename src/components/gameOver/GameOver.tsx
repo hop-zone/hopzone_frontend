@@ -15,8 +15,8 @@ const GameOver: FunctionComponent<GameOverProps> = ({ players }) => {
 
   const sortPlayers = (unsorted: PlayerObject[]) => {
     const sorted = unsorted.sort((a, b) => {
-      const score1 = Math.round(Math.abs(a.highestPosition))
-      const score2 = Math.round(Math.abs(b.highestPosition))
+      const score1 = a.score
+      const score2 = b.score
 
       if (score1 < score2) {
         return 1
@@ -69,7 +69,7 @@ const GameOver: FunctionComponent<GameOverProps> = ({ players }) => {
                 </div>
                 <h1 className=" text-center text-2xl text-purple-500">#1 {p.displayName}</h1>
                 <p className=" text-center text-3xl">
-                  {Math.abs(Math.round(p.highestPosition))}
+                  {p.score}
                 </p>
               </div>
             )
@@ -83,7 +83,7 @@ const GameOver: FunctionComponent<GameOverProps> = ({ players }) => {
                     #{i + 1} {p.displayName}
                   </h1>
                   <p className=" text-2xl">
-                    {Math.abs(Math.round(p.highestPosition))}
+                    {p.score}
                   </p>
                 </div>
               </div>
