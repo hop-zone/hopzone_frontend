@@ -20,7 +20,9 @@ export enum SocketMessages {
   moveLeft = 'f2b_moveLeft',
   moveRight = 'f2b_moveRight',
   stopMoving = 'f2b_stopMoving',
-  gameLoading = 'b2f_gameLoading'
+  gameLoading = 'b2f_gameLoading',
+  getScoreboard = 'f2b_scoreboard',
+  scoreboard = 'b2f_scoreboard'
 }
 
 interface ISocketContext {

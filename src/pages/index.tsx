@@ -12,6 +12,7 @@ import { Authenticated, useAuth } from 'src/providers/AuthProvider'
 import { SocketMessages, useSockets } from 'src/providers/SocketProvider'
 import { GameRoom } from 'src/models/serverModels/GameRoom'
 import ConnectionError from 'src/components/errors/ConnectionError'
+import { User } from 'src/models/serverModels/User'
 
 const ENDPOINT = 'http://localhost:3001'
 
@@ -20,6 +21,7 @@ const Home: NextPage = () => {
 
   const { socket } = useAuth()
   const { connectionError } = useSockets()
+  const [scoreBoard, setScoreBoard] = useState<User[]>([])
 
   const handleCreatLobbyClick = () => {
     socket?.emit('f2b_newLobby')
@@ -36,9 +38,15 @@ const Home: NextPage = () => {
     router.push(`/lobby?id=${data.roomId}`)
   }
 
+  const handleUpdateScoreboard = (data: User[]) => {
+    setScoreBoard(data)
+  }
+
   useEffect(() => {
     if (socket) {
+      socket.emit(SocketMessages.getScoreboard)
       socket.on(SocketMessages.lobbyInfo, handleJoinLobby)
+      socket.on(SocketMessages.scoreboard, handleUpdateScoreboard)
     }
 
     return () => {
@@ -82,6 +90,17 @@ const Home: NextPage = () => {
             )}
           </div>
         </Card>
+        <h2 className=" text-3xl text-theme-orange font-semibold mb-4">
+          Top players
+        </h2>
+        {scoreBoard.map(u => {
+          return (
+            <div key={u.uid}>
+              <p>{u.displayName}</p>
+              <p>{u.highScore}</p>
+            </div>
+          )
+        })}
       </Authenticated>
     </PageLayout>
   )
