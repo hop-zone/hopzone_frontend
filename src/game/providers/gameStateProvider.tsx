@@ -7,18 +7,37 @@ import React, {
   useEffect,
   useState,
 } from 'react'
-import { GameRoom } from '../interfaces/gameState'
-import { Platform } from '../models/platform'
-import { Player } from '../models/player'
+import { Game } from 'src/models/serverModels/Game'
+import { BoostedPlatform } from 'src/models/serverModels/gameObjects/BoostedPlatform'
+import { Enemy } from 'src/models/serverModels/gameObjects/Enemy'
+import { MovingPlatform } from 'src/models/serverModels/gameObjects/MovingPlatform'
+import { PlayerObject } from 'src/models/serverModels/gameObjects/PlayerObject'
+import { useAuth } from 'src/providers/AuthProvider'
+import { collide } from '../utils/collision'
+import { generateEnemies } from '../utils/enemyGeneration'
+import { moveEnemies } from '../utils/enemyMovement'
 import { generateLevel } from '../utils/levelGeneration'
+import {
+  generateBoostedPlatforms,
+  generateMovingPlatforms,
+  generatePlatforms,
+} from '../utils/platformGeneration'
+import { movePlatforms } from '../utils/platformMovement'
+import { EPlayerMovements, gravity, move } from '../utils/playerMovement'
 import { getRandomInt } from '../utils/random'
 
+interface IPlayerMovement {
+  uid: string
+  movement: EPlayerMovements
+}
+
 interface IGameStateContext {
-  state: GameRoom
+  state: Game | undefined
   updateGameState: () => void
-  moveLeft: (index: number) => void
-  moveRight: (index: number) => void
-  stopMoving: (index: number) => void
+  createGame: () => void
+  moveLeft: () => void
+  moveRight: () => void
+  stopMoving: () => void
 }
 
 const GameStateContext = createContext<IGameStateContext>(
@@ -30,152 +49,126 @@ export function useGameState() {
 }
 
 const GameStateProvider: FunctionComponent = ({ children }) => {
-  const worldWidth = 2000
-  const [state, setState] = useState<GameRoom>({
-    players: [],
-    platforms: [],
-    pressedKeys: { left: false, right: false },
-  })
+  const { user } = useAuth()
+  const [gameState, setGameState] = useState<Game>()
+  const [playerMovements, setPlayerMovements] = useState<IPlayerMovement[]>([])
 
-  useEffect(() => {
-    const player = new Player(0, -400)
-    const player2 = new Player(150, -400)
-    const level = generateLevel()
+  const createGame = () => {
+    const platforms = generateLevel()
 
-    setState({
-      ...state,
-      players: [player, player2],
-      platforms: level,
-    })
-  }, [])
+    const players = [
+      new PlayerObject(
+        0,
+        -50,
+        user?.uid || 'uid',
+        0,
+        user?.displayName || 'Guest',
+      ),
+    ]
 
-  const gravity = (player: Player, index: number) => {
-    //copy old player data
-    let newArray = [...state.players]
+    const movingPlatforms = [
+      new MovingPlatform(getRandomInt(-1000, 1000), getRandomInt(0, -500)),
+    ]
+    const boostedPlatforms = [
+      new BoostedPlatform(getRandomInt(-1000, 1000), getRandomInt(0, -500)),
+    ]
+    const enemies = [
+      new Enemy(
+        getRandomInt(-1000, 1000),
+        getRandomInt(-1000, -2000),
+        getRandomInt(3, 7),
+      ),
+    ]
 
-    //apply gravity
-    const y = player.y + player.ySpeed
-    const ySpeed = player.ySpeed + player.gravity
-
-    const xBeforeUpdate = player.x
-    newArray[index].x += newArray[index].xSpeed
-
-    //constrain player to world bounds
-    if (player.topLeft.x < -worldWidth / 2) {
-      newArray[index].x = xBeforeUpdate
-    } else if (player.bottomRight.x > worldWidth / 2) {
-      newArray[index].x = xBeforeUpdate
+    const game: Game = {
+      players: players,
+      alivePlayers: players.length,
+      deadPlayers: 0,
+      platforms: platforms,
+      movingPlatforms: movingPlatforms,
+      boostedPlatforms: boostedPlatforms,
+      enemies: enemies,
     }
 
-    newArray[index].y = y
-
-    newArray[index].ySpeed = ySpeed
-
-    //listen to player movement input
-    setState({ ...state, players: newArray })
-  }
-
-  const moveLeft = (index: number) => {
-    let newArray = [...state.players]
-
-    // console.log(worldWidth);
-
-    newArray[index].xSpeed = -newArray[index].movementSpeed
-
-    setState({ ...state, players: newArray })
-  }
-
-  const stopMoving = (index: number) => {
-    let newArray = [...state.players]
-
-    newArray[index].xSpeed = 0
-
-    setState({ ...state, players: newArray })
-  }
-
-  const moveRight = (index: number) => {
-    let newArray = [...state.players]
-
-    newArray[index].xSpeed = newArray[index].movementSpeed
-
-    setState({ ...state, players: newArray })
-  }
-
-  const collide = (player: Player, index: number) => {
-    state.platforms.forEach(platform => {
-      if (player.intersects(platform) && player.ySpeed > 0) {
-        let newArray = [...state.players]
-        newArray[index].ySpeed = -player.maxSpeed
-
-        setState({ ...state, players: newArray })
-      }
-    })
-  }
-
-  const generatePlatforms = () => {
-    const highestPlayer = Math.min.apply(
-      Math,
-      state.players.map(function (o) {
-        return o.y
-      }),
-    )
-    const highestPlatform = Math.min.apply(
-      Math,
-      state.platforms.map(function (o) {
-        return o.y
-      }),
-    )
-    const lowestPlayer = Math.max.apply(
-      Math,
-      state.players.map(function (o) {
-        return o.y
-      }),
-    )
-    const lowestPlatform = Math.max.apply(
-      Math,
-      state.platforms.map(function (o) {
-        return o.y
-      }),
-    )
-
-    let copyOfPlatforms = [...state.platforms]
-
-    if (highestPlayer < highestPlatform + 100) {
-      for (let i = 0; i < 4; i++) {
-        const newPlatform: Platform = new Platform(
-          getRandomInt(-1000, 1000),
-          getRandomInt(highestPlatform, highestPlatform - 100),
-        )
-        copyOfPlatforms.push(newPlatform)
-      }
-    }
-
-    if (lowestPlayer < lowestPlatform - 1000) {
-      copyOfPlatforms = copyOfPlatforms.filter((p: Platform) => {
-        return p.y != lowestPlatform
-      })
-    }
-
-    setState({ ...state, platforms: copyOfPlatforms })
+    setGameState(game)
   }
 
   const updateGameState = () => {
-    state.players.forEach((player, index) => {
-      gravity(player, index)
-      collide(player, index)
-      //   updateOuterPlayers(player, index)
+    let oldState = { ...gameState } as Game
+
+    if (oldState.alivePlayers == 0) {
+      console.log(`Everyone dead, quitting...`)
+      // stopService()
+    } else {
+      // oldState = leaveGame(oldState)
+      oldState = gravity(oldState)
+      oldState = movePlatforms(oldState)
+      oldState = moveEnemies(oldState)
+      oldState = collide(oldState)
+      playerMovements.map(p => {
+        oldState = move(oldState, p.uid, p.movement)
+      })
+
+      oldState = generatePlatforms(oldState)
+      oldState = generateMovingPlatforms(oldState)
+      oldState = generateBoostedPlatforms(oldState)
+      oldState = generateEnemies(oldState)
+
+      setGameState(oldState as Game)
+    }
+  }
+
+  const moveLeft = () => {
+    const p = playerMovements.find(p => {
+      p.uid == user?.uid
     })
-    generatePlatforms()
+
+    if (p) {
+      const index = playerMovements.indexOf(p)
+      p.movement = EPlayerMovements.left
+      playerMovements[index] = p
+      setPlayerMovements(playerMovements)
+    } else {
+      setPlayerMovements([{ uid: user!.uid, movement: EPlayerMovements.left }])
+    }
+  }
+  const moveRight = () => {
+    const p = playerMovements.find(p => {
+      p.uid == user?.uid
+    })
+
+    if (p) {
+      const index = playerMovements.indexOf(p)
+      p.movement = EPlayerMovements.right
+      playerMovements[index] = p
+      setPlayerMovements(playerMovements)
+    } else {
+      setPlayerMovements([{ uid: user!.uid, movement: EPlayerMovements.right }])
+    }
+  }
+  const stopMoving = () => {
+    const p = playerMovements.find(p => {
+      p.uid == user?.uid
+    })
+
+    if (p) {
+      const index = playerMovements.indexOf(p)
+      p.movement = EPlayerMovements.stop
+      playerMovements[index] = p
+      setPlayerMovements(playerMovements)
+    } else {
+      setPlayerMovements([{ uid: user!.uid, movement: EPlayerMovements.stop }])
+    }
   }
 
   const value = {
-    state,
+    state: gameState,
     updateGameState,
+    createGame,
     moveLeft,
     moveRight,
     stopMoving,
   }
-
   return (
     <GameStateContext.Provider value={value}>
       {children}
