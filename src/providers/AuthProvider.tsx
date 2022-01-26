@@ -28,7 +28,7 @@ export enum FirebaseError {
   tooManyRequests = 'auth/too-many-requests',
   weakPassword = 'auth/weak-password',
   emailInUse = 'auth/email-already-in-use',
-  invalidEmail = 'auth/invalid-email'
+  invalidEmail = 'auth/invalid-email',
 }
 
 interface IAuthContext {
@@ -91,14 +91,17 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
   useEffect(() => {
     let mounted = true
 
-    restoreAuth().then(data => {
-      if (mounted) {
-        createWebSocket(data.token)
-        setUser(data.state)
-        setSignedIn(true)
-      }
-    })
-    setLoaded(true)
+    if (!user && !socket) {
+      restoreAuth().then(data => {
+        if (mounted) {
+          createWebSocket(data.token)
+          setUser(data.state)
+          setSignedIn(true)
+        }
+      })
+      setLoaded(true)
+    }
+
     return () => {
       mounted = false
     }
@@ -163,7 +166,6 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
       try {
         createUserWithEmailAndPassword(auth, email, password)
           .then(async userCredential => {
-
             await changeUserDisplayName(username, userCredential.user)
             await login(email, password).then(r => {
               resolve({ success: true })

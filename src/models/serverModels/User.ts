@@ -4,4 +4,6 @@ export interface User {
     displayName?: string
 
     highScore?: number
+
+    highScoreDate?: Date
 }

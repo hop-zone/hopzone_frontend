@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { MdArrowForward } from 'react-icons/md'
+import { MdArrowForward, MdPerson } from 'react-icons/md'
 import Card from 'src/components/card'
 import Button from 'src/components/forms/Button'
 import PageLayout from 'src/components/layout'
@@ -19,7 +19,7 @@ const ENDPOINT = 'http://localhost:3001'
 const Home: NextPage = () => {
   const router = useRouter()
 
-  const { socket } = useAuth()
+  const { socket, user } = useAuth()
   const { connectionError } = useSockets()
   const [scoreBoard, setScoreBoard] = useState<User[]>([])
 
@@ -39,7 +39,12 @@ const Home: NextPage = () => {
   }
 
   const handleUpdateScoreboard = (data: User[]) => {
-    setScoreBoard(data)
+    const users = data.map(u => {
+      if (u.highScoreDate) u.highScoreDate = new Date(u.highScoreDate)
+
+      return u
+    })
+    setScoreBoard(users)
   }
 
   useEffect(() => {
@@ -93,14 +98,30 @@ const Home: NextPage = () => {
         <h2 className=" text-3xl text-theme-orange font-semibold mb-4">
           Top players
         </h2>
-        {scoreBoard.map(u => {
-          return (
-            <div key={u.uid}>
-              <p>{u.displayName}</p>
-              <p>{u.highScore}</p>
-            </div>
-          )
-        })}
+        <div className="md:grid grid-cols-2 gap-x-2">
+          {scoreBoard.map(p => {
+            return (
+              <Card
+                key={p.uid}
+                className={` p-5 flex justify-between items-center text-2xl  mb-2`}
+              >
+                <div className="flex items-center gap-2">
+                  <MdPerson size={24} />
+                  <span>
+                    {p.displayName + ' '}
+                    {user?.uid == p.uid ? <span>(You)</span> : null}
+                  </span>
+                </div>
+                <div>
+                  <p className=' text-right text-orange-700'>{p.highScore}m</p>
+                  <p className=' text-sm text-purple-400'>
+                    {p.highScoreDate?.toLocaleString('en-us', {year: "numeric", month: "short", day: "2-digit"})}
+                  </p>
+                </div>
+              </Card>
+            )
+          })}
+        </div>
       </Authenticated>
     </PageLayout>
   )
