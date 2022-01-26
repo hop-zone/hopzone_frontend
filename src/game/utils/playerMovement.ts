@@ -1,6 +1,10 @@
-import { Game } from "../../entities/Game"
-import { PlayerObject } from "../../entities/gameobjects/PlayerObject"
-import { EPlayerMovements } from "../../interfaces/workerMessage"
+import { Game } from "src/models/serverModels/Game"
+import { PlayerObject } from "src/models/serverModels/gameObjects/PlayerObject"
+export enum EPlayerMovements {
+    left = 'left',
+    right = 'right',
+    stop = 'stop',
+}
 
 export const kill = (state: Game, players: PlayerObject[]) => {
     const updatedState = state

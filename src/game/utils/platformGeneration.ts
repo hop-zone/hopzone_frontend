@@ -1,8 +1,9 @@
-import { Game } from "../../entities/Game"
-import { BoostedPlatform } from "../../entities/gameobjects/BoostedPlatform"
-import { MovingPlatform } from "../../entities/gameobjects/MovingPlatform"
-import { Platform } from "../../entities/gameobjects/Platform"
-import { getRandomInt } from "./getRandomInt"
+import { Game } from "src/models/serverModels/Game"
+import { BoostedPlatform } from "src/models/serverModels/gameObjects/BoostedPlatform"
+import { MovingPlatform } from "src/models/serverModels/gameObjects/MovingPlatform"
+import { Platform } from "src/models/serverModels/gameObjects/Platform"
+import { getRandomInt } from "./random"
+
 
 export const generatePlatforms = (oldState: Game) => {
     const state = oldState
@@ -39,7 +40,7 @@ export const generatePlatforms = (oldState: Game) => {
     if (highestPlayer < highestPlatform + 200) {
         let highestPlatformObject = copyOfPlatforms.find((p) => { return p.y == highestPlatform })
         const newPlatform: Platform = new Platform(
-            getRandomInt(highestPlatformObject.x - 500, highestPlatformObject.x + 300),
+            getRandomInt(highestPlatformObject!.x - 500, highestPlatformObject!.x + 300),
             getRandomInt(highestPlatform, highestPlatform - 300),
             getRandomInt(0, 3)
         )

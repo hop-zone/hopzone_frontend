@@ -11,6 +11,7 @@ import { Game } from 'src/models/serverModels/Game'
 import { BoostedPlatform } from 'src/models/serverModels/gameObjects/BoostedPlatform'
 import { Enemy } from 'src/models/serverModels/gameObjects/Enemy'
 import { MovingPlatform } from 'src/models/serverModels/gameObjects/MovingPlatform'
+import { Platform } from 'src/models/serverModels/gameObjects/Platform'
 import { PlayerObject } from 'src/models/serverModels/gameObjects/PlayerObject'
 import { useAuth } from 'src/providers/AuthProvider'
 import { collide } from '../utils/collision'
@@ -66,6 +67,8 @@ const GameStateProvider: FunctionComponent = ({ children }) => {
       ),
     ]
 
+    platforms.push(new Platform(players[0].x, 0, getRandomInt(0, 3)))
+
     const movingPlatforms = [
       new MovingPlatform(getRandomInt(-1000, 1000), getRandomInt(0, -500)),
     ]
@@ -106,6 +109,7 @@ const GameStateProvider: FunctionComponent = ({ children }) => {
       oldState = moveEnemies(oldState)
       oldState = collide(oldState)
       playerMovements.map(p => {
+        
         oldState = move(oldState, p.uid, p.movement)
       })
 

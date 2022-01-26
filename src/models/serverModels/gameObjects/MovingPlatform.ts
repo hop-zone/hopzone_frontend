@@ -16,8 +16,8 @@ export class MovingPlatform extends GameObject {
         super(xPos, yPos)
 
         this.originXpos = xPos
-        this.movingRange = 40
-        this.xSpeed = -5
+        this.movingRange = 200
+        this.xSpeed = 3
     }
 
 }

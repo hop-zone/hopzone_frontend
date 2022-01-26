@@ -23,7 +23,7 @@ const Lobby: NextPage<Props> = ({ host }) => {
 
   const [gameLoading, setGameLoading] = useState(false)
   const { socket, user } = useAuth()
-  const { joinLobby, gameState } = useSockets()
+  const { joinLobby, gameState, moveLeft, moveRight, stopMoving } = useSockets()
   const [hostId, setHostId] = useState('')
   const [players, setPlayers] = useState<User[]>([])
   const [copied, setCopied] = useState(false)
@@ -38,7 +38,7 @@ const Lobby: NextPage<Props> = ({ host }) => {
   }
 
   const handleContinueClick = () => {
-    if(socket){
+    if (socket) {
       socket.emit('f2b_restartGame', router.query.id as string)
     }
   }
@@ -69,8 +69,7 @@ const Lobby: NextPage<Props> = ({ host }) => {
         }
       })
 
-      console.log(gameState);
-      
+      console.log(gameState)
 
       setPlayers(players)
       setGameLoading(false)
@@ -157,7 +156,12 @@ const Lobby: NextPage<Props> = ({ host }) => {
           </>
         )
       ) : (
-        <TestMultiplayer gameState={gameState.game!} />
+        <TestMultiplayer
+          gameState={gameState.game!}
+          moveLeft={moveLeft}
+          moveRight={moveRight}
+          stopMoving={stopMoving}
+        />
       )}
     </PageLayout>
   )

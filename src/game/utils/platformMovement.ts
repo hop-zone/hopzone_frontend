@@ -1,4 +1,5 @@
-import { Game } from "../../entities/Game"
+import { Game } from "src/models/serverModels/Game"
+
 
 export const movePlatforms = (state: Game) => {
     state.movingPlatforms = state.movingPlatforms.map((p) => {
