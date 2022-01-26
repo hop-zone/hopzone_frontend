@@ -8,5 +8,6 @@ export interface GameRoom {
     hostId: string
     players: User[]
     hasStarted: boolean
+    hasEnded: boolean
 }
 

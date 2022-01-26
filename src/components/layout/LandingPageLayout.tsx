@@ -5,7 +5,7 @@ const LandingPageLayout: FunctionComponent = ({ children }) => {
   return (
     <div className="md:flex">
       <div className="w-full h-fitscreen md:h-screen bg-purple-600 col-span-3 relative">
-        <Image src={'/img/landing_img.png'} layout='fill' objectFit='cover' quality={100}/>
+        <Image src={'/img/landing_img.svg'} layout='fill' objectFit='cover'/>
       </div>
       {children}
     </div>

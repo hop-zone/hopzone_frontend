@@ -14,6 +14,9 @@ import { Game } from 'src/models/serverModels/Game'
 import { Player } from './models/player'
 import { Platform } from './models/platform'
 import { useAuth } from 'src/providers/AuthProvider'
+import { MovingPlatform } from './models/movingPlatform'
+import { BoostedPlatform } from './models/boostedPlatform'
+import { Enemy } from './models/enemy'
 
 const Sketch = dynamic(() => import('react-p5'), {
   ssr: false,
@@ -45,6 +48,8 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
   const [platformImages, setPlatformImages] = useState<p5Types.Image[]>([])
   const [characterImages, setCharacterImages] = useState<p5Types.Image[]>([])
   const [scoreboardImages, setScoreboardImages] = useState<p5Types.Image[]>([])
+  const [cometImages, setCometImages] = useState<p5Types.Image[]>([])
+  const [firstAnimationImg, setFirstAnimationImg] = useState(false)
   const [fonts, setFonts] = useState<Fonts>()
 
   const preload = (p5: p5Types) => {
@@ -65,22 +70,28 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
     const platform_0 = p5.loadImage('/img/platform_0.png')
     const platform_1 = p5.loadImage('/img/platform_1.png')
     const platform_2 = p5.loadImage('/img/platform_2.png')
+    const platform_moving = p5.loadImage('/img/platform_moving.png')
+    const platform_boosted = p5.loadImage('/img/platform_boosted.png')
+
+    const comet_1 = p5.loadImage('/img/comet_1.png')
+    const comet_2 = p5.loadImage('/img/comet_2.png')
 
     const cross = p5.loadImage('/img/cross.png')
 
     const fontRegular = p5.loadFont('/font/Kanit-Regular.ttf')
     const fontSemibold = p5.loadFont('/font/Kanit-SemiBold.ttf')
 
-    setImages([
-      platformImg,
-      playerImg,
-      backgroundImage,
-      cross
+    setImages([platformImg, playerImg, backgroundImage, cross])
+    setCharacterImages([
+      orangeCharacter,
+      prupleCharacter,
+      greenCharacter,
+      blueCharacter,
     ])
-    setCharacterImages([orangeCharacter, prupleCharacter, greenCharacter, blueCharacter])
-    setPlatformImages([platform_0, platform_1, platform_2])
+    setPlatformImages([platform_0, platform_1, platform_2, platform_moving, platform_boosted])
     setScoreboardImages([orangeHead, prupleHead, greenHead, blueHead])
     setFonts({ regular: fontRegular, semibold: fontSemibold })
+    setCometImages([comet_1, comet_2])
   }
   const setup = (p5: p5Types, canvasParentRef: Element) => {
     setCanvasWidth(canvasParentRef.clientWidth)
@@ -93,6 +104,8 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
   }
 
   const draw = (p5: p5Types) => {
+    let spectating = false
+
     const players = gameState.players.map(p => {
       return new Player(
         p.x,
@@ -102,18 +115,8 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
         p.displayName,
         p.highestPosition,
         p.xSpeed,
-      )
-    })
-
-    const deadPlayers = gameState.deadPlayers.map(p => {
-      return new Player(
-        p.x,
-        p.y,
-        p.uid,
-        p.playerNum,
-        p.displayName,
-        p.highestPosition,
-        p.xSpeed,
+        p.isDead,
+        p.score
       )
     })
 
@@ -121,9 +124,28 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
       return new Platform(p.x, p.y, p.platformType)
     })
 
-    const player = players.find(p => {
+    const movingPlatforms = gameState.movingPlatforms.map(p => {
+      return new MovingPlatform(p.x, p.y, p.xSpeed)
+    })
+
+    const boostedPlatforms = gameState.boostedPlatforms.map(p => {
+      return new BoostedPlatform(p.x, p.y)
+    })
+
+    const enemies = gameState.enemies.map(e => {
+      return new Enemy(e.x, e.y, e.ySpeed)
+    })
+
+    let player = players.find(p => {
       return p.uid == user?.uid
     })
+
+    if (player?.isDead) {
+      player = players.find(p => {
+        return !p.isDead
+      })
+      spectating = true
+    }
 
     p5.push()
     p5.translate(translatedX / 10, translatedY / 10)
@@ -131,7 +153,7 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
     p5.imageMode(p5.CENTER)
     const imageSize = 1500
     for (let i = -1; i < 2; i++) {
-      for (let j = 0; j < 3; j++) {
+      for (let j = 0; j < 10; j++) {
         p5.image(images[2], i * imageSize, j * -imageSize, imageSize, imageSize)
       }
     }
@@ -143,8 +165,26 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
       platform.show(p5, platformImages[platform.platformType])
     })
 
+    movingPlatforms.forEach(platform => {
+      platform.show(p5, platformImages[3])
+    })
+
+    boostedPlatforms.forEach(platform => {
+      platform.show(p5, platformImages[4])
+    })
+
+    if (p5.frameCount % 15 == 0) {
+      setFirstAnimationImg(!firstAnimationImg)
+    }
+
+    enemies.forEach(enemy => {
+      enemy.show(p5, firstAnimationImg ? cometImages[0] : cometImages[1])
+    })
+
     players.forEach((p, i) => {
-      p.show(p5, characterImages[p.playerNum])
+      if (!p.isDead) {
+        p.show(p5, characterImages[p.playerNum])
+      }
     })
 
     let leftBorder = -translatedX
@@ -160,25 +200,48 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
       if (player.bottomRight.x > rightBorder - 100) {
         setTranslatedX(-player.bottomRight.x + canvasWidth - 100)
       }
-      if (player.topLeft.y < topBorder + 100) {
-        setTranslatedY(-player.topLeft.y + 100)
+      if (player.topLeft.y < topBorder + 200) {
+        setTranslatedY(-player.topLeft.y + 200)
       }
-      if (player.bottomRight.y > bottomBorder - 100) {
-        setTranslatedY(-player.bottomRight.y - 100 + canvasHeight)
+      if (player.bottomRight.y > bottomBorder - 200) {
+        setTranslatedY(-player.bottomRight.y - 200 + canvasHeight)
       }
     }
 
     p5.pop()
-    showScoreBoard(p5, players, deadPlayers)
+
+    if (spectating && player) {
+      showSpectating(p5, player.displayName)
+    }
+
+    showScoreBoard(p5, players)
   }
 
-  const showScoreBoard = (p5: p5Types, alivePlayers: Player[], deadPlayers: Player[]) => {
+  const showSpectating = (p5: p5Types, playerName: string) => {
+    p5.push()
+    p5.fill(0, 0, 0, 50)
+    p5.rectMode('corner')
+    p5.rect(0, 0, canvasWidth, canvasHeight)
+    p5.translate(canvasWidth / 2, 0)
+    p5.textAlign(p5.CENTER)
+    p5.textFont(fonts?.semibold as object)
+    p5.textSize(64)
+    p5.fill(255)
+    p5.text('YOU DIED', 0, 100)
+    p5.textSize(24)
+    p5.textFont(fonts?.regular as object)
+    p5.text(`Now spectating ${playerName}`, 0, canvasHeight - 50)
+
+    p5.pop()
+  }
+
+  const showScoreBoard = (p5: p5Types, alivePlayers: Player[]) => {
     p5.push()
     p5.translate(20, 20)
 
     const sorted = alivePlayers.sort((a, b) => {
-      const score1 = Math.round(Math.abs(a.highestPosition))
-      const score2 = Math.round(Math.abs(b.highestPosition))
+      const score1 = a.score
+      const score2 = b.score
 
       if (score1 < score2) {
         return 1
@@ -192,35 +255,31 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
       const img = scoreboardImages[i]
       p5.push()
       p5.scale(0.8)
-      if(i == 0) {
+      if (i == 0) {
         p5.scale(1.2)
       }
       p5.translate(0, i * 100)
       p5.imageMode(p5.CORNER)
       p5.image(scoreboardImages[p.playerNum], 0, 0)
+      if (p.isDead) {
+        p5.image(images[3], 0, 0)
+      }
       p5.fill(255)
       p5.textSize(16)
       p5.text(p.displayName, img.width + 10, img.height - 10)
       p5.textSize(24)
       p5.textFont(fonts?.semibold as object)
-      p5.text(Math.round(Math.abs(p.highestPosition)), img.width + 10, img.height / 2)
+      p5.text(
+        p.score,
+        img.width + 10,
+        img.height / 2,
+      )
       p5.pop()
     })
     p5.pop()
 
     p5.push()
     p5.translate(20, canvasHeight - 20)
-
-    deadPlayers.map((p, i) =>{
-      p5.push()
-      p5.scale(0.8)
-      p5.translate(0, i * -70)
-      p5.imageMode(p5.CORNER)
-      p5.image(scoreboardImages[p.playerNum], 0, -scoreboardImages[p.playerNum].height)
-      p5.image(images[3], 0, -scoreboardImages[p.playerNum].height)
-      p5.pop()
-    })
-
   }
 
   const keyPressed = (p5: p5Types) => {

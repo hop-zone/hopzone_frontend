@@ -59,9 +59,10 @@ const QuickJoinMenu = () => {
 
   return (
     <ul className=" overflow-scroll mb-8">
-      {menuItems.map(item => {
+      {menuItems.length > 0 ? menuItems.map(item => {
         return <MenuItem key={item.gameId} item={item} />
-      })}
+      }): <p className=' text-center'>There are currently no available lobbies.</p>}
+      
     </ul>
   )
 }

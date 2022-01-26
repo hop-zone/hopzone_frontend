@@ -1,6 +1,5 @@
 import React, { FunctionComponent } from 'react'
 import { MdPerson } from 'react-icons/md'
-import { Player } from 'src/models/player'
 import { User } from 'src/models/serverModels/User'
 import { useAuth } from 'src/providers/AuthProvider'
 import Card from '../card'
