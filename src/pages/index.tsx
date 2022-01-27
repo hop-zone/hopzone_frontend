@@ -69,7 +69,7 @@ const Home: NextPage = () => {
           <div className="p-8 max-w-xs mx-auto flex flex-col justify-between">
             <SubTitle className="text-center">Single Player</SubTitle>
             <p className=" mb-8">
-              Don't want to play with other people? Have a slow internet
+              Don&apos;t want to play with other people? Have a slow internet
               connection? Want to pass time alone? Start your own single player
               game!
             </p>

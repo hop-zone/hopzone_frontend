@@ -6,9 +6,7 @@ import GameOver from 'src/components/gameOver/GameOver'
 import PageLayout from 'src/components/layout'
 import LobbyPlayers from 'src/components/lobby/LobbyPlayers'
 import PageTitle from 'src/components/text/PageTitle'
-import SubTitle from 'src/components/text/SubTitle'
 import TestMultiplayer from 'src/game/testMultiplayer'
-import { useWarnLeaveLobby } from 'src/hooks/useWarnLeaveLobby'
 import { User } from 'src/models/serverModels/User'
 import { useAuth } from 'src/providers/AuthProvider'
 import { SocketMessages, useSockets } from 'src/providers/SocketProvider'
@@ -28,7 +26,6 @@ const Lobby: NextPage<Props> = ({ host }) => {
   const [players, setPlayers] = useState<User[]>([])
   const [copied, setCopied] = useState(false)
 
-  useWarnLeaveLobby(router.query.id)
 
   const handleStartGameClick = () => {
     if (socket) {

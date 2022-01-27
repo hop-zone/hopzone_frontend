@@ -59,7 +59,7 @@ const GameOver: FunctionComponent<GameOverProps> = ({ players }) => {
         {sortedPlayers?.map((p, i) => {
           if (i == 0) {
             return (
-              <div className={colcount == 1 ? ' col-span-1': colcount == 2 ? 'col-span-2': colcount == 3 ? ' col-span-3': ''}>
+              <div key={p.uid} className={colcount == 1 ? ' col-span-1': colcount == 2 ? 'col-span-2': colcount == 3 ? ' col-span-3': ''}>
                 <div className="flex justify-center mb-4">
                   <Image
                     src={images[p.playerNum]}
@@ -75,7 +75,7 @@ const GameOver: FunctionComponent<GameOverProps> = ({ players }) => {
             )
           }
           return (
-            <div className={''}>
+            <div key={p.uid} className={''}>
               <div className="flex items-center justify-center gap-2 mb-4">
                 <Image src={images[p.playerNum]} width={83} height={74} />
                 <div>
