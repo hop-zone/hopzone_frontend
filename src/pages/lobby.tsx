@@ -1,5 +1,5 @@
 import { GetServerSideProps, NextPage } from 'next'
-import { useRouter } from 'next/router'
+import { Router, useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import Button from 'src/components/forms/Button'
 import GameOver from 'src/components/gameOver/GameOver'
@@ -21,11 +21,11 @@ const Lobby: NextPage<Props> = ({ host }) => {
 
   const [gameLoading, setGameLoading] = useState(false)
   const { socket, user } = useAuth()
+  const { leaveLobby } = useSockets()
   const { joinLobby, gameState, moveLeft, moveRight, stopMoving } = useSockets()
   const [hostId, setHostId] = useState('')
   const [players, setPlayers] = useState<User[]>([])
   const [copied, setCopied] = useState(false)
-
 
   const handleStartGameClick = () => {
     if (socket) {
@@ -72,6 +72,29 @@ const Lobby: NextPage<Props> = ({ host }) => {
       setGameLoading(false)
     }
   }, [gameState])
+
+  useEffect(() => {
+    const routeChangeStart = (url: string) => {
+      leaveLobby(router.query.id as string)
+    }
+
+    const beforeunload = (e: {
+      preventDefault: () => void
+      returnValue: string
+    }) => {
+      leaveLobby(router.query.id as string)
+    }
+
+    if (router.query.id && socket) {
+      window.addEventListener('beforeunload', beforeunload)
+      Router.events.on('routeChangeStart', routeChangeStart)
+    }
+
+    return () => {
+      window.removeEventListener('beforeunload', beforeunload)
+      Router.events.off('routeChangeStart', routeChangeStart)
+    }
+  }, [router.query.id, socket])
 
   return (
     <PageLayout>

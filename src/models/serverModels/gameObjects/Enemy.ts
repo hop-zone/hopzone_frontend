@@ -19,5 +19,4 @@ export class Enemy extends GameObject {
         this.movingRange = 400
         this.ySpeed = ySpeed
     }
-
 }

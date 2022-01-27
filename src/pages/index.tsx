@@ -48,13 +48,15 @@ const Home: NextPage = () => {
   }
 
   useEffect(() => {
-    if (socket) {
+    let mounted = true
+    if (socket && mounted) {
       socket.emit(SocketMessages.getScoreboard)
       socket.on(SocketMessages.lobbyInfo, handleJoinLobby)
       socket.on(SocketMessages.scoreboard, handleUpdateScoreboard)
     }
 
     return () => {
+      mounted = false
       // socket?.disconnect()
       socket?.off(SocketMessages.lobbyInfo, handleJoinLobby)
     }
@@ -113,9 +115,13 @@ const Home: NextPage = () => {
                   </span>
                 </div>
                 <div>
-                  <p className=' text-right text-orange-700'>{p.highScore}m</p>
-                  <p className=' text-sm text-purple-400'>
-                    {p.highScoreDate?.toLocaleString('en-us', {year: "numeric", month: "short", day: "2-digit"})}
+                  <p className=" text-right text-orange-700">{p.highScore}m</p>
+                  <p className=" text-sm text-purple-400">
+                    {p.highScoreDate?.toLocaleString('en-us', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: '2-digit',
+                    })}
                   </p>
                 </div>
               </Card>

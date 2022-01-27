@@ -8,7 +8,6 @@ const GameSession = () => {
   return (
     <GameStateProvider>
       <PageLayout>
-        <PageTitle>Game</PageTitle>
         <SinglePlayer/>
       </PageLayout>
     </GameStateProvider>
