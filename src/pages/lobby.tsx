@@ -1,14 +1,12 @@
 import { GetServerSideProps, NextPage } from 'next'
-import { useRouter } from 'next/router'
+import { Router, useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import Button from 'src/components/forms/Button'
 import GameOver from 'src/components/gameOver/GameOver'
 import PageLayout from 'src/components/layout'
 import LobbyPlayers from 'src/components/lobby/LobbyPlayers'
 import PageTitle from 'src/components/text/PageTitle'
-import SubTitle from 'src/components/text/SubTitle'
 import TestMultiplayer from 'src/game/testMultiplayer'
-import { useWarnLeaveLobby } from 'src/hooks/useWarnLeaveLobby'
 import { User } from 'src/models/serverModels/User'
 import { useAuth } from 'src/providers/AuthProvider'
 import { SocketMessages, useSockets } from 'src/providers/SocketProvider'
@@ -23,12 +21,11 @@ const Lobby: NextPage<Props> = ({ host }) => {
 
   const [gameLoading, setGameLoading] = useState(false)
   const { socket, user } = useAuth()
-  const { joinLobby, gameState } = useSockets()
+  const { leaveLobby } = useSockets()
+  const { joinLobby, gameState, moveLeft, moveRight, stopMoving } = useSockets()
   const [hostId, setHostId] = useState('')
   const [players, setPlayers] = useState<User[]>([])
   const [copied, setCopied] = useState(false)
-
-  useWarnLeaveLobby(router.query.id)
 
   const handleStartGameClick = () => {
     if (socket) {
@@ -38,7 +35,7 @@ const Lobby: NextPage<Props> = ({ host }) => {
   }
 
   const handleContinueClick = () => {
-    if(socket){
+    if (socket) {
       socket.emit('f2b_restartGame', router.query.id as string)
     }
   }
@@ -69,13 +66,35 @@ const Lobby: NextPage<Props> = ({ host }) => {
         }
       })
 
-      console.log(gameState);
-      
+      console.log(gameState)
 
       setPlayers(players)
       setGameLoading(false)
     }
   }, [gameState])
+
+  useEffect(() => {
+    const routeChangeStart = (url: string) => {
+      leaveLobby(router.query.id as string)
+    }
+
+    const beforeunload = (e: {
+      preventDefault: () => void
+      returnValue: string
+    }) => {
+      leaveLobby(router.query.id as string)
+    }
+
+    if (router.query.id && socket) {
+      window.addEventListener('beforeunload', beforeunload)
+      Router.events.on('routeChangeStart', routeChangeStart)
+    }
+
+    return () => {
+      window.removeEventListener('beforeunload', beforeunload)
+      Router.events.off('routeChangeStart', routeChangeStart)
+    }
+  }, [router.query.id, socket])
 
   return (
     <PageLayout>
@@ -157,7 +176,12 @@ const Lobby: NextPage<Props> = ({ host }) => {
           </>
         )
       ) : (
-        <TestMultiplayer gameState={gameState.game!} />
+        <TestMultiplayer
+          gameState={gameState.game!}
+          moveLeft={moveLeft}
+          moveRight={moveRight}
+          stopMoving={stopMoving}
+        />
       )}
     </PageLayout>
   )

@@ -24,6 +24,10 @@ const Sketch = dynamic(() => import('react-p5'), {
 
 interface MultiplayerProps {
   gameState: Game
+  moveLeft: any
+  moveRight: any
+  stopMoving: any
+  isSinglePlayer?: boolean
 }
 
 interface Fonts {
@@ -33,12 +37,16 @@ interface Fonts {
 
 const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
   gameState,
+  moveLeft,
+  moveRight,
+  stopMoving,
+  isSinglePlayer,
 }) => {
   const parentRef = useRef<HTMLDivElement>(null)
 
-  const { moveLeft, moveRight, stopMoving } = useSockets()
   const { user } = useAuth()
 
+  const { updateGameState } = useGameState()
   const [canvasWidth, setCanvasWidth] = useState(1280 - 32)
   const [canvasHeight, setCanvasHeight] = useState(720)
   const [translatedX, setTranslatedX] = useState(canvasWidth / 2 + 50)
@@ -88,7 +96,13 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
       greenCharacter,
       blueCharacter,
     ])
-    setPlatformImages([platform_0, platform_1, platform_2, platform_moving, platform_boosted])
+    setPlatformImages([
+      platform_0,
+      platform_1,
+      platform_2,
+      platform_moving,
+      platform_boosted,
+    ])
     setScoreboardImages([orangeHead, prupleHead, greenHead, blueHead])
     setFonts({ regular: fontRegular, semibold: fontSemibold })
     setCometImages([comet_1, comet_2])
@@ -116,7 +130,7 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
         p.highestPosition,
         p.xSpeed,
         p.isDead,
-        p.score
+        p.score,
       )
     })
 
@@ -215,6 +229,10 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
     }
 
     showScoreBoard(p5, players)
+
+    if (isSinglePlayer) {
+      updateGameState()
+    }
   }
 
   const showSpectating = (p5: p5Types, playerName: string) => {
@@ -269,11 +287,7 @@ const TestMultiplayer: FunctionComponent<MultiplayerProps> = ({
       p5.text(p.displayName, img.width + 10, img.height - 10)
       p5.textSize(24)
       p5.textFont(fonts?.semibold as object)
-      p5.text(
-        p.score,
-        img.width + 10,
-        img.height / 2,
-      )
+      p5.text(p.score, img.width + 10, img.height / 2)
       p5.pop()
     })
     p5.pop()
