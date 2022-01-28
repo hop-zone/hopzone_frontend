@@ -28,7 +28,6 @@ const Home: NextPage = () => {
   }
 
   const handleJoinLobby = (data: GameRoom) => {
-    console.log(data);
     
     router.push(`/lobby?id=${data.roomId}`)
   }
