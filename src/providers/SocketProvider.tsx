@@ -7,6 +7,7 @@ import {
 } from 'react'
 import { Socket } from 'socket.io-client'
 import { GameRoom } from 'src/models/serverModels/GameRoom'
+import { User } from 'src/models/serverModels/User'
 import { useAuth } from './AuthProvider'
 
 export enum SocketMessages {
@@ -22,13 +23,17 @@ export enum SocketMessages {
   stopMoving = 'f2b_stopMoving',
   gameLoading = 'b2f_gameLoading',
   getScoreboard = 'f2b_scoreboard',
-  scoreboard = 'b2f_scoreboard'
+  scoreboard = 'b2f_scoreboard',
+  newLobby = 'f2b_newLobby',
+  startGame = 'f2b_startGame',
+  restartGame = 'f2b_restartGame'
 }
 
 interface ISocketContext {
   socket: Socket | undefined
   activeLobbies: GameRoom[] | undefined
   gameState: GameRoom | undefined
+  scoreBoard: User[]
   connectionError: boolean
   joinLobby: (lobbyId: string) => Promise<boolean>
   leaveLobby: (lobbyId: string) => Promise<boolean>
@@ -47,6 +52,7 @@ export const SocketProvider: FunctionComponent = ({ children }) => {
   const { socket } = useAuth()
   const [activeLobbies, setActiveLobbies] = useState<GameRoom[]>()
   const [gameState, setGameState] = useState<GameRoom>()
+  const [scoreBoard, setScoreBoard] = useState<User[]>([])
   const [connectionError, setConnectionError] = useState(false)
 
   useEffect(() => {
@@ -56,9 +62,16 @@ export const SocketProvider: FunctionComponent = ({ children }) => {
       })
 
       socket.on(SocketMessages.gameState, (data: GameRoom) => {
-        // console.log(data);
-
         setGameState(data)
+      })
+
+      socket.on(SocketMessages.scoreboard, (data: User[]) => {
+        const users = data.map(u => {
+          if (u.highScoreDate) u.highScoreDate = new Date(u.highScoreDate)
+
+          return u
+        })
+        setScoreBoard(users)
       })
 
       socket.on(SocketMessages.connectionFailed, () => {
@@ -127,6 +140,7 @@ export const SocketProvider: FunctionComponent = ({ children }) => {
     activeLobbies: activeLobbies,
     socket,
     connectionError,
+    scoreBoard,
     joinLobby,
     leaveLobby,
     gameState,

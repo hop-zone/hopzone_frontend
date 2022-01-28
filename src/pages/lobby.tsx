@@ -29,13 +29,13 @@ const Lobby: NextPage<Props> = ({ host }) => {
 
   const handleStartGameClick = () => {
     if (socket) {
-      socket.emit('f2b_startGame', router.query.id as string)
+      socket.emit(SocketMessages.startGame, router.query.id as string)
     }
   }
 
   const handleContinueClick = () => {
     if (socket) {
-      socket.emit('f2b_restartGame', router.query.id as string)
+      socket.emit(SocketMessages.restartGame, router.query.id as string)
     }
   }
 

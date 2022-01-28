@@ -101,7 +101,6 @@ const GameStateProvider: FunctionComponent = ({ children }) => {
 
     if (oldState.alivePlayers == 0) {
     } else {
-      // oldState = leaveGame(oldState)
       oldState = gravity(oldState)
       oldState = movePlatforms(oldState)
       oldState = moveEnemies(oldState)
