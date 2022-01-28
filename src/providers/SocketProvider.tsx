@@ -69,8 +69,6 @@ export const SocketProvider: FunctionComponent = ({ children }) => {
         setConnectionError(false)
       })
     }
-
-    console.log(socket)
   }, [socket])
 
   const joinLobby = async (lobbyId: string): Promise<boolean> => {

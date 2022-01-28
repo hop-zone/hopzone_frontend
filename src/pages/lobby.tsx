@@ -29,7 +29,6 @@ const Lobby: NextPage<Props> = ({ host }) => {
 
   const handleStartGameClick = () => {
     if (socket) {
-      console.log('sending start game request')
       socket.emit('f2b_startGame', router.query.id as string)
     }
   }
@@ -65,9 +64,6 @@ const Lobby: NextPage<Props> = ({ host }) => {
           uid: p.uid,
         }
       })
-
-      console.log(gameState)
-
       setPlayers(players)
       setGameLoading(false)
     }

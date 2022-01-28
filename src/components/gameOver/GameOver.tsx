@@ -29,7 +29,6 @@ const GameOver: FunctionComponent<GameOverProps> = ({ players }) => {
 
     if (sorted.length > 2) {
       setcolcount(sorted.length - 1)
-      console.log(sortedPlayers)
     }
 
     return sorted
