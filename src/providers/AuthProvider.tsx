@@ -191,7 +191,6 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
         displayName: username,
       })
         .then(value => {
-          console.log(value)
 
           resolve(true)
         })

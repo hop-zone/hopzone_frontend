@@ -100,10 +100,7 @@ const GameStateProvider: FunctionComponent = ({ children }) => {
     let oldState = { ...gameState } as Game
 
     if (oldState.alivePlayers == 0) {
-      console.log(`Everyone dead, quitting...`)
-      // stopService()
     } else {
-      // oldState = leaveGame(oldState)
       oldState = gravity(oldState)
       oldState = movePlatforms(oldState)
       oldState = moveEnemies(oldState)

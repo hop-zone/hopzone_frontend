@@ -62,8 +62,6 @@ const Login = () => {
         }
       })
       .catch((error: LoginResponse) => {
-        console.log(error)
-
         if (error.errCode == FirebaseError.wrongPassword) {
           setLoading(false)
           formItems[1].isFaulty = true

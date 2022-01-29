@@ -61,7 +61,6 @@ const Register = () => {
       })
       .catch((e: LoginResponse) => {
 
-        console.log(e);
         
         if (e.errCode == FirebaseError.weakPassword) {
           setLoading(false)

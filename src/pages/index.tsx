@@ -14,37 +14,22 @@ import { GameRoom } from 'src/models/serverModels/GameRoom'
 import ConnectionError from 'src/components/errors/ConnectionError'
 import { User } from 'src/models/serverModels/User'
 
-const ENDPOINT = 'http://localhost:3001'
-
 const Home: NextPage = () => {
   const router = useRouter()
 
   const { socket, user } = useAuth()
-  const { connectionError } = useSockets()
-  const [scoreBoard, setScoreBoard] = useState<User[]>([])
+  const { connectionError, scoreBoard } = useSockets()
 
   const handleCreatLobbyClick = () => {
-    socket?.emit('f2b_newLobby')
+    socket?.emit(SocketMessages.newLobby)
   }
   const handleSingleplayerClick = () => {
     router.push('/gamesession')
   }
 
   const handleJoinLobby = (data: GameRoom) => {
-    console.log('pushing')
-
-    console.log(data)
-
+    
     router.push(`/lobby?id=${data.roomId}`)
-  }
-
-  const handleUpdateScoreboard = (data: User[]) => {
-    const users = data.map(u => {
-      if (u.highScoreDate) u.highScoreDate = new Date(u.highScoreDate)
-
-      return u
-    })
-    setScoreBoard(users)
   }
 
   useEffect(() => {
@@ -52,7 +37,6 @@ const Home: NextPage = () => {
     if (socket && mounted) {
       socket.emit(SocketMessages.getScoreboard)
       socket.on(SocketMessages.lobbyInfo, handleJoinLobby)
-      socket.on(SocketMessages.scoreboard, handleUpdateScoreboard)
     }
 
     return () => {

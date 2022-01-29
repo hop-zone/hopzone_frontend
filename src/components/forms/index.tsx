@@ -129,7 +129,6 @@ const Form: FunctionComponent<FormProps> = ({
   useEffect(() => {
     function handleSubmit() {
       if (formHasErrors(items)) {
-        console.log('form has errors')
       } else {
         onSubmit(items)
       }
